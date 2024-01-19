@@ -20,9 +20,16 @@ import encrypt as enc
 
 
 @app.route('/')
+@app.route('/index.html')
 def index():
-    
     return render_template('index.html')
+
+@app.route('/login.html')
+def loginPage():
+    return render_template('login.html')
+@app.route('/l')
+def reginPage():
+    return render_template('create_user.html')
 
 
 @app.route('/insert new customer',methods = ['post'])
