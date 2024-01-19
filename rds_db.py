@@ -31,6 +31,13 @@ import MySQLdb.cursors
 # """
 # cursor.execute(create_table)
 
+def select_all(mysql):
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute('SELECT * FROM Users')
+    test = cur.fetchall()
+    return test
+
+
 def get_user(mysql,email):
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cur.execute('SELECT * FROM Users WHERE email = % s', (email,))

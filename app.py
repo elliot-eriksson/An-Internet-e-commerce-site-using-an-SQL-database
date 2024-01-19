@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, flash, redirect,url_for, jsonify, session 
 from flask_mysqldb import MySQL
+# from flask_admin import Admin
 import MySQLdb.cursors
 import re
 
@@ -9,16 +10,17 @@ app = Flask(__name__)
 app.secret_key = 'your secret key'
 
 app.config['MYSQL_HOST'] = 'd0018e-1.c38ei448gz7c.eu-north-1.rds.amazonaws.com'
-app.config['MYSQL_USER'] = 'admin'
+app.config['MYSQL_USER'] = 'Customer'
 print("Password")
-app.config['MYSQL_PASSWORD'] = input()
+userpass = input()
+app.config['MYSQL_PASSWORD'] = userpass
 app.config['MYSQL_DB'] = 'D0018E1'
 
 mysql = MySQL(app)
 import rds_db as db
 import encrypt as enc
 
-
+# admin = Admin(app)
 
 
 @app.route('/')
@@ -26,12 +28,27 @@ import encrypt as enc
 def index():
     return render_template('index.html')
 
-@app.route('/login.html')
+@app.route('/login')
+# @app.route('/login.html')
 def loginPage():
     return render_template('login.html')
 @app.route('/l')
 def reginPage():
     return render_template('create_user.html')
+
+
+@app.route('/users')
+def selectUsers():
+    try:
+        if session['isAdmin']:
+            userDetails = db.select_all(mysql)
+    # print(userDetails)
+        for e in userDetails:
+            print(e['customer_id'])
+        return render_template('admin.html', userDetails=userDetails)
+    except:
+        var = "Access Denied"
+        return render_template('index.html', var=var)
 
 
 @app.route('/insert new customer',methods = ['post'])
@@ -58,6 +75,14 @@ def login_user():
         # password = request.form['pwd']
         password = request.form['pwd']
 
+        if email == "admin":
+            app.config['MYSQL_USER'] = 'admin'
+            app.config['MYSQL_PASSWORD'] = password
+            var = "admin"
+            session['loggedin'] = True
+            session['isAdmin'] = True
+            return render_template('admin.html', var=var)
+
         if db.check_credentails(mysql,email, password):
             account = db.get_user(mysql,email)
 
@@ -78,6 +103,10 @@ def login_user():
 
 @app.route('/logout')
 def logout():
+    if session['isAdmin']:
+        app.config['MYSQL_USER'] = 'Customer'
+        app.config['MYSQL_PASSWORD'] = userpass
+        session.pop('isAdmin', False)
     session.pop('loggedin', None)
     session.pop('id', None)
     session.pop('username', None)
@@ -85,5 +114,4 @@ def logout():
 
 
 if __name__ == "__main__":
-    
     app.run(port=5002, debug=True)
