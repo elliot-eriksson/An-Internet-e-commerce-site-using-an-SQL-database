@@ -9,7 +9,8 @@ app.secret_key = 'your secret key'
 
 app.config['MYSQL_HOST'] = 'd0018e-1.c38ei448gz7c.eu-north-1.rds.amazonaws.com'
 app.config['MYSQL_USER'] = 'admin'
-app.config['MYSQL_PASSWORD'] = 'Potatis1'
+print("Password")
+app.config['MYSQL_PASSWORD'] = input()
 app.config['MYSQL_DB'] = 'D0018E1'
 
 mysql = MySQL(app)
