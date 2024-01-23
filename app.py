@@ -1,10 +1,11 @@
 from flask import Flask, render_template, request, flash, redirect,url_for, jsonify, session 
 from flask_mysqldb import MySQL
+from datetime import datetime
 import MySQLdb.cursors
 import re
 import rds_db as db
 import encrypt as enc
-
+from form import AddProducts
 app = Flask(__name__)
 
 
@@ -38,7 +39,7 @@ def reginPage():
 def selectUsers():
     try:
         if session['isAdmin']:
-            userDetails = db.select_all(mysql)
+            userDetails = db.select_all_users(mysql)
     # print(userDetails)
         for e in userDetails:
             print(e['customer_id'])
@@ -109,6 +110,35 @@ def logout():
     session.pop('username', None)
     return redirect('/')
 
+@app.route('/Addproduct', methods=['POST', 'GET'])
+def Addproduct():
+    if request.method == 'GET':
+        # if session['isAdmin']:
+        #         products = db.select_products(mysql)
+        # return render_template('admin.html', products=products)
+        try:
+            if session['isAdmin']:
+                products = db.select_products(mysql)
+            return render_template('admin.html', products=products)
+        except:
+            var = "Access Denied"
+            return render_template('index.html', var=var)
+    elif request.method == 'POST':
+        try:
+            if session['isAdmin']:
+                product_name = request.form['product_name']
+                price = request.form['price']
+                stock = request.form['stock']
+                if stock > 0:
+                    last_restock_date = datetime.now()
+                else:
+                    last_restock_date = None
+                db.insert_product(mysql, product_name, price, stock, last_restock_date)
+                var = "product created"
+            return render_template('admin.html', var=var)
+        except:
+            var = "Access Denied"
+            return render_template('index.html', var=var)
 
 if __name__ == "__main__":
     app.run(port=5002, debug=True)
