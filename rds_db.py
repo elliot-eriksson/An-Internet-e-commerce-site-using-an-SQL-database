@@ -1,35 +1,5 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sat Jul 25 13:34:18 2020
-
-@author: hp
-"""
-
-import pymysql
 import encrypt as enc
 import MySQLdb.cursors
-#import aws_credentials as rds
-# print("Username : "),
-# username = input(),
-# print("Password : "),
-# password = input()
-# conn = pymysql.connect(
-#         host= 'd0018e-1.c38ei448gz7c.eu-north-1.rds.amazonaws.com', #endpoint link
-#         port = 3306, # 3306
-#         # user = username, # admin
-#         # password = password, #adminadmin
-#         db = 'D0018E1', #test
-
-#         user = 'admin',
-#         password = 'Potatis1'
-#         )
-
-#Table Creation
-# cursor=conn.cursor()
-# create_table="""
-# create table Details (name varchar(200),email varchar(200),comment varchar(200),gender varchar(20) )
-# """
-# cursor.execute(create_table)
 
 def select_all(mysql):
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)

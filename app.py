@@ -1,8 +1,9 @@
 from flask import Flask, render_template, request, flash, redirect,url_for, jsonify, session 
 from flask_mysqldb import MySQL
-# from flask_admin import Admin
 import MySQLdb.cursors
 import re
+import rds_db as db
+import encrypt as enc
 
 app = Flask(__name__)
 
@@ -17,10 +18,6 @@ app.config['MYSQL_PASSWORD'] = userpass
 app.config['MYSQL_DB'] = 'D0018E1'
 
 mysql = MySQL(app)
-import rds_db as db
-import encrypt as enc
-
-# admin = Admin(app)
 
 
 @app.route('/')

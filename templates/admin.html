@@ -43,23 +43,21 @@
         <button type="submit" name="submit" class="btn btn-danger">Logout</button>
     </form>
 </div>
-  
+
 <div>
-    <form action="/users">
-        <button type="submit" name="submit" class="btn btn-danger" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">select</button>
-    </form>
+  <form action="/users">
+    <button id='toggle' class='btn btn-primary'>
+      Select
+    </button>    
+  </form>
 </div>
-<div>
-    <form action="/users">
-        <button type="submit" name="submit" class="btn btn-danger" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">select2</button>
-    </form>
-</div>
-
-
-
+<button id='toggle' class='btn btn-primary'>
+  Select
+</button> 
 
     
-<div class="collapse" id="collapseExample">
+<div class="hidden" id="collapseExample">
+  <div class="table-responsive">
     <table class="table">
         <thead>
             <tr>
@@ -82,4 +80,5 @@
         </tr>
         {% endfor %}
     </table>
+  </div>
 </div>
