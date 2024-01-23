@@ -24,7 +24,8 @@ mysql = MySQL(app)
 @app.route('/')
 @app.route('/index.html')
 def index():
-    return render_template('index.html')
+    productTest = db.select_products(mysql)
+    return render_template('index.html', productTest=productTest)
 
 @app.route('/login')
 # @app.route('/login.html')
@@ -129,7 +130,9 @@ def Addproduct():
                 product_name = request.form['product_name']
                 price = request.form['price']
                 stock = request.form['stock']
-                if stock > 0:
+                image1 = request.form['img1']
+                print(image1)
+                if int(stock) > 0:
                     last_restock_date = datetime.now()
                 else:
                     last_restock_date = None
@@ -140,5 +143,10 @@ def Addproduct():
             var = "Access Denied"
             return render_template('index.html', var=var)
 
+# @app.route('/Display product', methods=['GET'])
+# def displayProducts():
+
+
+    
 if __name__ == "__main__":
     app.run(port=5002, debug=True)

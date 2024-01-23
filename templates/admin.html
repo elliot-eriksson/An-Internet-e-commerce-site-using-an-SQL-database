@@ -102,9 +102,9 @@
       <div class="container">
         <h2 class="text-center bg-info p-1">Add images</h2>
         <div class="row">
-          <div class="col-md-5"><input type="file" id="img" name="img" accept="image/*"></div>
-          <div class="col-md-5"><input type="file" id="img" name="img" accept="image/*"></div>
-          <div class="col-md-5"><input type="file" id="img" name="img" accept="image/*"></div>
+          <div class="col-md-5"><input type="file" id="img1" name="img1" accept="image/*"></div>
+          <div class="col-md-5"><input type="file" id="img2" name="img2" accept="image/*"></div>
+          <div class="col-md-5"><input type="file" id="img3" name="img3" accept="image/*"></div>
         </div>
       </div>
       <button type="submit" name="submit" class="btn btn-success">Add product</button>
@@ -128,7 +128,7 @@
         <thead>
             <tr>
             <th scope="col">#</th>
-            <th scope="col">prodcut_id</th>
+            <th scope="col">product_id</th>
             <th scope="col">product_name</th>
             <th scope="col">product_price</th>
             <th scope="col">product_discount</th>
@@ -142,7 +142,7 @@
         </thead>
         {% for product in products %}
         <tr>
-            <td>{{product['prodcut_id']}}</td>
+            <td>{{product['product_id']}}</td>
             <td>{{product['product_name']}}</td>
             <td>{{product['product_price']}}</td>
             <td>{{product['product_discount']}}</td>

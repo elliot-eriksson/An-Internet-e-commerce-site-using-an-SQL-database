@@ -136,6 +136,28 @@
     </div>
   </div>
 
+  <div class="container">
+    <div class="row">
+      {% for product in productTest %}
+      <div class="col-md-3 mt-3">
+        <div class="card">
+          <img src="{{url_for('static', filename ='{{product['image_address1']}}')}}" alt="test2">
+
+          <img src="{{url_for('static', filename ='images/image1.jpeg')}}" alt="test2">
+          <div class="card-body">
+            <h5 class="text-center">{{product['product_name']}}</h5>
+            <p class="text-center">Price ${{product['product_price']}}</p>
+          </div>
+          <div class="card-footer">
+            <a href="#" class="float-left btn btn-sm btn-primary">details</a>
+            <a href="#" class="float-right btn btn-sm btn-warning">Add to cart</a>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
 
     <h4> The details are:</h4>
        {{var}}
