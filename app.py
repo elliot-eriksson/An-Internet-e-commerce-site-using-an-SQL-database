@@ -155,6 +155,13 @@ def addToCart():
     productTest = db.select_products(mysql)
     return render_template('index.html', productTest=productTest, var=var)
 
+@app.route('/edit_product', methods=['POST'])
+def editProduct():
+    product_id = request.form['product_id']
+    product = db.get_product(mysql, product_id)
+    return render_template('edit_product.html', product=product, product_id=product_id)
+
+    
     
 if __name__ == "__main__":
     app.run(port=5002, debug=True)
