@@ -90,6 +90,7 @@
       {% endfor %}
     </div>
   </div>
+  
 
   <div id="register" class="col-sm-4">
     <form action="/insert new customer" method="post">
@@ -137,7 +138,9 @@
     <br>
     <hr>
 </div>
-
+<form action="/checkout">
+  <button onclick = "setCartCookie()" type="submit" name="users" class="btn btn-danger">check out</button>
+</form>
 
 <div class="mt-5 p-4 bg-dark text-white text-center">
   <p>Footer</p>

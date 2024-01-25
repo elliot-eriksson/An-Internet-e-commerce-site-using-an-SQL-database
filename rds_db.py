@@ -19,12 +19,6 @@ def get_product(mysql,product_id):
     product = cur.fetchone()
     return product
 
-def insert_product(mysql, product_name, price, stock, last_restock_date, image_address1):
-    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    cur.execute("INSERT INTO Products (product_name, product_price, product_available_amount, product_total_amount, last_restock_date, image_address1) VALUES (%s,%s,%s,%s,%s,%s)"
-        ,(product_name, price, stock, stock, last_restock_date, image_address1,))
-    mysql.connection.commit()
-
 def get_user(mysql,email):
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cur.execute('SELECT * FROM Users WHERE email = % s', (email,))
@@ -32,10 +26,22 @@ def get_user(mysql,email):
     return user
         
 
+def insert_product(mysql, product_name, price, stock, last_restock_date, image_address1):
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("INSERT INTO Products (product_name, product_price, product_available_amount, product_total_amount, last_restock_date, image_address1) VALUES (%s,%s,%s,%s,%s,%s)"
+        ,(product_name, price, stock, stock, last_restock_date, image_address1,))
+    mysql.connection.commit()
+
 def insert_user(mysql,email, first_name, last_name, password, date_of_birth):
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cur.execute("INSERT INTO Users (email, first_name, last_name, password, date_of_birth) VALUES (%s,%s,%s,%s,%s)"
         ,(email, first_name, last_name, password, date_of_birth,))
+    mysql.connection.commit()
+
+def update_product(mysql, product_id, product_name, price, stock, last_restock_date, totalStock):
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("UPDATE Products SET product_name = %s, product_price = %s, product_available_amount = %s, product_total_amount = %s  WHERE product_id = %s "
+        ,(product_name, price, stock, totalStock, last_restock_date, product_id,))
     mysql.connection.commit()
 
 

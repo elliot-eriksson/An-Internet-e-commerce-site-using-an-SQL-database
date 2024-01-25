@@ -5,6 +5,12 @@ function cartSession(product_name){
   console.log(cartArray)
 }
 
-function checkOutCookie(){
-  console.log("cookie")
+function setCartCookie() {
+  // Convert the cartArray to a JSON string
+  var cartArrayString = JSON.stringify(cartArray);
+
+  // Set the cookie with the cartArrayString
+  document.cookie = "cartArray=" + cartArrayString + "; path=/";
+  console.log("Cookie set");
+ 
 }

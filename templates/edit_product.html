@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Edit proudct</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"> 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"> </script>
+  
+</head>
+<body>
+
+<div class="product" id="producttable">
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                <th scope="col">product_id</th>
+                <th scope="col">product_name</th>
+                <th scope="col">product_price</th>
+                <th scope="col">product_discount</th>
+                <th scope="col">product_discount_datefrom</th>
+                <th scope="col">product_discount_dateto</th>
+                <th scope="col">product_total_amount</th>
+                <th scope="col">product_available_amount</th>
+                <th scope="col">avrage_rating</th>
+                <th scope="col">last_restock_date</th>
+                </tr>
+            </thead>
+            {% for product in products %}
+            <tr>
+                <td>{{product['product_id']}}</td>
+                <td>{{product['product_name']}}</td>
+                <td>{{product['product_price']}}</td>
+                <td>{{product['product_discount']}}</td>
+                <td>{{product['product_discount_datefrom']}}</td>
+                <td>{{product['product_discount_dateto']}}</td>
+                <td>{{product['product_total_amount']}}</td>
+                <td>{{product['product_available_amount']}}</td>
+                <td>{{product['avrage_rating']}}</td>
+                <td>{{product['last_restock_date']}}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+    <div class="col-md-2"></div>
+    <div class="col-md-8">
+        <h2 class="text-center bg-info p-1">Change product</h2>
+        <form action="/edit_product" method="POST" enctype="multipart/form-data">
+            {% for product in products %}
+            <input type="hidden" name="product_id" value="{{product['product_id']}}">
+            {% endfor %}
+        <div class="form-group">
+            <label for="product_name" class="form-label">Product Name:</label>
+            <input type="text" class="form-control" id="product_name" placeholder="Enter product name" name="product_name">
+        </div>
+        <div class="form-group">
+            <label for="price" class="form-label">Price:</label>
+            <input type="value" class="form-control" id="price" placeholder="Enter price" name="price">
+        </div>
+        <div class="form-group">
+            <label for="stock" class="form-label">Add to stock:</label>
+            <input type="value" class="form-control" id="stock" placeholder="Add product stock" name="stock">
+        </div>
+        <button type="submit" name="submit" class="btn btn-success">Change product</button>
+        </form>
+    </div>
+    </div>
+    </div>
+    
+</body>
+</html>

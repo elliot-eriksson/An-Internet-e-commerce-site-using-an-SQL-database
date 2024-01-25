@@ -6,6 +6,7 @@ import encrypt as enc
 from form import AddProducts
 from werkzeug.utils import secure_filename
 import os
+import json
 app = Flask(__name__)
 
 
@@ -155,12 +156,56 @@ def addToCart():
     productTest = db.select_products(mysql)
     return render_template('index.html', productTest=productTest, var=var)
 
-@app.route('/edit_product', methods=['POST'])
+@app.route('/edit_product', methods=['GET'])
 def editProduct():
-    product_id = request.form['product_id']
-    product = db.get_product(mysql, product_id)
-    return render_template('edit_product.html', product=product, product_id=product_id)
+    if request.method == 'GET':
+        # try:
+        # if session['isAdmin']:
+        product_id = request.form['product_id']
+        products = db.get_product(mysql, product_id)
+        return render_template('edit_product.html', products=products, product_id=product_id)
+        # except:
+        #     var = "Access Denied"
+        #     return render_template('index.html', var=var)
+    elif request.method == 'POST':
+        # try:
+            if session['isAdmin']:
+                product_id = request.form['product_id']
+                product = db.get_product(mysql, product_id)
+                product_name = request.form['product_name']
+                if product_name == '':
+                    product_name = product['product_name']
+                price = request.form['price']
+                if price == '' or int(price) <= 0:
+                    price = product['price']  
+                stock = request.form['stock']
+                if int(stock) > 0:
+                    last_restock_date = datetime.now()
+                else:
+                    last_restock_date = None
+                if stock == "" or int(stock) == 0:
+                    stock = product['product_available_amount']
+                    last_restock_date = product['last_restock_date']
+                elif int(stock) < 0:
+                    var = "Cant enter negative amount of stock"
+                    return render_template('admin.html', var=var)
+                else:
+                    stock = int(stock) + product['product_available_amount']
+                    totalStock = int(stock) + product['product_total_amount']
 
+
+                db.update_product(mysql, product_id, price, stock, last_restock_date, totalStock)
+                var = "changed"
+            return render_template('admin.html', var=var)
+    
+@app.route('/checkout')
+def checkOut():
+    cart_array_cookie = json.loads(request.cookies.get('cartArray'))
+    print("---------------",cart_array_cookie)
+    # Parse the JSON string to get the cartArray
+
+    # You can now use 'cart_array' in your template or logic
+    return render_template('index.html', var=cart_array_cookie)
     
     
 if __name__ == "__main__":

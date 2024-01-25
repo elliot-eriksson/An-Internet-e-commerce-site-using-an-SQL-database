@@ -136,26 +136,30 @@
             <th scope="col">product_available_amount</th>
             <th scope="col">avrage_rating</th>
             <th scope="col">last_restock_date</th>
+            <th scope="col">Actions</th>
             </tr>
         </thead>
         {% for product in products %}
         <tr>
-            <td>{{product['product_id']}}</td>
-            <td>{{product['product_name']}}</td>
-            <td>{{product['product_price']}}</td>
-            <td>{{product['product_discount']}}</td>
-            <td>{{product['product_discount_datefrom']}}</td>
-            <td>{{product['product_discount_dateto']}}</td>
-            <td>{{product['product_total_amount']}}</td>
-            <td>{{product['product_available_amount']}}</td>
-            <td>{{product['avrage_rating']}}</td>
-            <td>{{product['last_restock_date']}}</td>
+            <form action="/edit_product" method="get"> <!-- Formulär för varje produkt -->
+                <input type="hidden" name="product_id" value="{{product['product_id']}}">
+                <td>{{product['product_id']}}</td>
+                <td>{{product['product_name']}}</td>
+                <td>{{product['product_price']}}</td>
+                <td>{{product['product_discount']}}</td>
+                <td>{{product['product_discount_datefrom']}}</td>
+                <td>{{product['product_discount_dateto']}}</td>
+                <td>{{product['product_total_amount']}}</td>
+                <td>{{product['product_available_amount']}}</td>
+                <td>{{product['avrage_rating']}}</td>
+                <td>{{product['last_restock_date']}}</td>
+                <td><button type="submit">Edit</button></td> <!-- Knapp för att skicka formuläret -->
+            </form>
         </tr>
         {% endfor %}
     </table>
   </div>
 </div>
-
 
 
 
