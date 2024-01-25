@@ -82,10 +82,8 @@
           </div>
           <div class="card-footer">
             <a href="#" class="float-left btn btn-sm btn-primary">details</a>
-            <form action="/Add to cart" method="POST">
-              <button type="submit" name="addtocart" class="btn btn-warning">Add to cart</button>
-              <!-- <a href="#" class="float-right btn btn-sm btn-warning">Add to cart</a> -->
-            </form>
+            <a onclick="cartSession('{{product['product_id']}}')" class="float-right btn btn-sm btn-warning">Add to cart</a>
+
           </div>
         </div>
       </div>
@@ -144,6 +142,7 @@
 <div class="mt-5 p-4 bg-dark text-white text-center">
   <p>Footer</p>
 </div>
+<script src="{{ url_for('static', filename='script.js') }}"></script>
 
 </body>
 </html>

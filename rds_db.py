@@ -13,9 +13,9 @@ def select_products(mysql):
     products = cur.fetchall()
     return products
 
-def get_product(mysql,product_name):
+def get_product(mysql,product_id):
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    cur.execute('SELECT * FROM Products WHERE product_name = % s', (product_name,))
+    cur.execute('SELECT * FROM Products WHERE product_id = % s', (product_id,))
     product = cur.fetchone()
     return product
 
