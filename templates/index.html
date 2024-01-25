@@ -47,25 +47,6 @@
     <p>slogan</p>
   </div>
 
-  <div class="container mt-5">
-    <div class="row">
-      <div class="col-sm-4">
-        <h3>Reviews</h3>
-        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit...</p>
-        <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris...</p>
-      </div>
-      <div class="col-sm-4">
-        <h3>Top sellers</h3>
-        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit...</p>
-        <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris...</p>
-      </div>
-      <div class="col-sm-4">
-        <h3>Highest discounts</h3>
-        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit...</p>
-        <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris...</p>
-      </div>
-    </div>
-  </div>
 <!-- #--------------------->
 <!-- <div id="login" class="col-sm-4">
   <form action="/login" method="post">
@@ -85,6 +66,33 @@
     <button type="submit" class="btn btn-primary">Submit</button>
   </form>
 </div> -->
+
+
+
+  <div class="container">
+    <div class="row">
+      {% for product in productTest %}
+      <div class="col-md-3 mt-3">
+        <div class="card">
+          <img src="{{ url_for('static', filename=product['image_address1']) }}" alt="{{product['product_name']}}">
+
+          <div class="card-body">
+            <h5 class="text-center">{{product['product_name']}}</h5>
+            <p class="text-center">Price ${{product['product_price']}}</p>
+          </div>
+          <div class="card-footer">
+            <a href="#" class="float-left btn btn-sm btn-primary">details</a>
+            <form action="/Add to cart" method="POST">
+              <button type="submit" name="addtocart" class="btn btn-warning">Add to cart</button>
+              <!-- <a href="#" class="float-right btn btn-sm btn-warning">Add to cart</a> -->
+            </form>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
   <div id="register" class="col-sm-4">
     <form action="/insert new customer" method="post">
       <div class="form-group">
@@ -124,41 +132,6 @@
         <button type="users" name="users" class="btn btn-danger">select</button>
     </form>
   </div>
-
-  
-  <div class="container">
-    <h2>Simple Collapsible</h2>
-    <a href="#demo" class="btn btn-info" data-bs-toggle="collapse">Simple collapsible</a>
-    <div id="demo" class="collapse">
-      Lorem ipsum dolor sit amet, consectetur adipisicing elit,
-      sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-      quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-    </div>
-  </div>
-
-  <div class="container">
-    <div class="row">
-      {% for product in productTest %}
-      <div class="col-md-3 mt-3">
-        <div class="card">
-          <img src="{{url_for('static', filename ='{{product['image_address1']}}')}}" alt="test2">
-
-          <img src="{{url_for('static', filename ='images/image1.jpeg')}}" alt="test2">
-          <div class="card-body">
-            <h5 class="text-center">{{product['product_name']}}</h5>
-            <p class="text-center">Price ${{product['product_price']}}</p>
-          </div>
-          <div class="card-footer">
-            <a href="#" class="float-left btn btn-sm btn-primary">details</a>
-            <a href="#" class="float-right btn btn-sm btn-warning">Add to cart</a>
-          </div>
-        </div>
-      </div>
-      {% endfor %}
-    </div>
-  </div>
-
-
     <h4> The details are:</h4>
        {{var}}
 

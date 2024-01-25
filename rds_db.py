@@ -19,10 +19,10 @@ def get_product(mysql,product_name):
     product = cur.fetchone()
     return product
 
-def insert_product(mysql, product_name, price, stock, last_restock_date):
+def insert_product(mysql, product_name, price, stock, last_restock_date, image_address1):
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    cur.execute("INSERT INTO Products (product_name, product_price, product_available_amount, product_available_amount, last_restock_date) VALUES (%s,%s,%s,%s,%s)"
-        ,(product_name, price, stock, stock, last_restock_date,))
+    cur.execute("INSERT INTO Products (product_name, product_price, product_available_amount, product_total_amount, last_restock_date, image_address1) VALUES (%s,%s,%s,%s,%s,%s)"
+        ,(product_name, price, stock, stock, last_restock_date, image_address1,))
     mysql.connection.commit()
 
 def get_user(mysql,email):

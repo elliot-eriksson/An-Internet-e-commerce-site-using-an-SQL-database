@@ -1,11 +1,11 @@
 from flask import Flask, render_template, request, flash, redirect,url_for, jsonify, session 
 from flask_mysqldb import MySQL
 from datetime import datetime
-import MySQLdb.cursors
-import re
 import rds_db as db
 import encrypt as enc
 from form import AddProducts
+from werkzeug.utils import secure_filename
+import os
 app = Flask(__name__)
 
 
@@ -17,6 +17,9 @@ print("Password")
 userpass = input()
 app.config['MYSQL_PASSWORD'] = userpass
 app.config['MYSQL_DB'] = 'D0018E1'
+
+UPLOAD_FOLDER = 'C:/Users/Ellio/Desktop/D0018E/An-Internet-e-commerce-site-using-an-SQL-database/static/images'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 mysql = MySQL(app)
 
@@ -125,27 +128,32 @@ def Addproduct():
             var = "Access Denied"
             return render_template('index.html', var=var)
     elif request.method == 'POST':
-        try:
+        # try:
             if session['isAdmin']:
                 product_name = request.form['product_name']
                 price = request.form['price']
                 stock = request.form['stock']
-                image1 = request.form['img1']
-                print(image1)
+               
+                file = request.files['img1']
+                filename = secure_filename(file.filename)
+                image_address1 = "images/" + filename
+                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
                 if int(stock) > 0:
                     last_restock_date = datetime.now()
                 else:
                     last_restock_date = None
-                db.insert_product(mysql, product_name, price, stock, last_restock_date)
+                db.insert_product(mysql, product_name, price, stock, last_restock_date, image_address1)
                 var = "product created"
             return render_template('admin.html', var=var)
-        except:
-            var = "Access Denied"
-            return render_template('index.html', var=var)
+        # except:
+        #     var = "Access Denied"
+        #     return render_template('index.html', var=var)
 
-# @app.route('/Display product', methods=['GET'])
-# def displayProducts():
-
+@app.route('/Add to cart', methods=['POST'])
+def addToCart():
+    var = "product Added"
+    productTest = db.select_products(mysql)
+    return render_template('index.html', productTest=productTest, var=var)
 
     
 if __name__ == "__main__":
