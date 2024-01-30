@@ -207,14 +207,12 @@ def editProduct():
     
 @app.route('/checkout')
 def checkOut():
-    amount = 1
     cart_array_cookie = json.loads(request.cookies.get('cartArray'))
     print("---------------",cart_array_cookie)
     order_id = db.insert_order(mysql, session['id'], datetime.now())
     print("---------- ORDERID", order_id)
     total_price = 0
     cart_array_cookie_nodup = list(dict.fromkeys(cart_array_cookie))
-    # [[product_id, cart_array_cookie.count(product_id)] for product_id in set(cart_array_cookie)]
     occurrences = Counter(cart_array_cookie)
     for product_id in cart_array_cookie_nodup:
 
@@ -227,7 +225,21 @@ def checkOut():
     db.update_order(mysql, order_id, total_price)
     checkOut = db.get_product_from_order(mysql, order_id)
     return render_template('order_conf.html',checkOut=checkOut)
-    
+
+@app.route('/shoppingcart')
+def shoppingcart():
+    cart_array_cookie = json.loads(request.cookies.get('cartArray'))
+    cart_array_cookie_nodup = list(dict.fromkeys(cart_array_cookie))
+    occurrences = Counter(cart_array_cookie)
+    shoppingcart = []
+    for product_id in cart_array_cookie_nodup:
+        product = db.get_product(mysql, product_id)
+        product["amount"] = int(occurrences[str(product_id)])
+        product["total_price"]  = int(product["amount"])*int(product['product_price'])
+        shoppingcart.append(product)
+
+    return render_template('shopping_cart.html',shoppingcart=shoppingcart)
+
     
 if __name__ == "__main__":
     app.run(port=5002, debug=True)
