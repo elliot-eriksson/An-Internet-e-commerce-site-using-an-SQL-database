@@ -67,7 +67,7 @@ def update_order(mysql, order_id, total_price):
 
 def update_product(mysql, product_id, product_name, price, stock, last_restock_date, totalStock):
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    cur.execute("UPDATE Products SET product_name = %s, product_price = %s, product_available_amount = %s, product_total_amount = %s  WHERE product_id = %s "
+    cur.execute("UPDATE Products SET product_name = %s, product_price = %s, product_available_amount = %s, product_total_amount = %s, last_restock_date = %s WHERE product_id = %s "
         ,(product_name, price, stock, totalStock, last_restock_date, product_id,))
     mysql.connection.commit()
 

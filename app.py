@@ -3,7 +3,6 @@ from flask_mysqldb import MySQL
 from datetime import datetime
 import rds_db as db
 import encrypt as enc
-from form import AddProducts
 from werkzeug.utils import secure_filename
 from collections import Counter
 import os
@@ -159,14 +158,16 @@ def addToCart():
     productTest = db.select_products(mysql)
     return render_template('index.html', productTest=productTest, var=var)
 
-@app.route('/edit_product', methods=['GET'])
+@app.route('/edit_product', methods=['POST','GET'])
 def editProduct():
     if request.method == 'GET':
         # try:
         # if session['isAdmin']:
-        product_id = request.form['product_id']
-        products = db.get_product(mysql, product_id)
-        return render_template('edit_product.html', products=products, product_id=product_id)
+        product_id = request.args['product_id']
+        print("PRODUCT_ID", product_id)
+        product = db.get_product(mysql, product_id)
+        print("PRODUCT", product)
+        return render_template('edit_product.html', product=product, product_id=product_id)
         # except:
         #     var = "Access Denied"
         #     return render_template('index.html', var=var)
@@ -174,30 +175,37 @@ def editProduct():
         # try:
             if session['isAdmin']:
                 product_id = request.form['product_id']
+                print("PRODUCT_ID", product_id)
                 product = db.get_product(mysql, product_id)
+                print("PRODUCT", product)
                 product_name = request.form['product_name']
-                if product_name == '':
+                if product_name == '' or product_name is None:
                     product_name = product['product_name']
                 price = request.form['price']
-                if price == '' or int(price) <= 0:
+                if price is None or int(price) <= 0:
                     price = product['price']  
                 stock = request.form['stock']
-                if int(stock) > 0:
+
+                if stock == "" or stock is None:
+                    stock = 0
+                    print("",stock)
+                    last_restock_date = None
+                elif int(stock) > 0:
                     last_restock_date = datetime.now()
                 else:
                     last_restock_date = None
-                if stock == "" or int(stock) == 0:
+                if price is None or stock == 0:
                     stock = product['product_available_amount']
                     last_restock_date = product['last_restock_date']
-                elif int(stock) < 0:
+                    totalStock = product['product_total_amount']
+                elif stock < 0:
                     var = "Cant enter negative amount of stock"
                     return render_template('admin.html', var=var)
                 else:
                     stock = int(stock) + product['product_available_amount']
                     totalStock = int(stock) + product['product_total_amount']
 
-
-                db.update_product(mysql, product_id, price, stock, last_restock_date, totalStock)
+                db.update_product(mysql, product_id, product_name, price, stock, last_restock_date, totalStock)
                 var = "changed"
             return render_template('admin.html', var=var)
     
