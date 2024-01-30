@@ -5,6 +5,7 @@ import rds_db as db
 import encrypt as enc
 from form import AddProducts
 from werkzeug.utils import secure_filename
+from collections import Counter
 import os
 import json
 app = Flask(__name__)
@@ -100,19 +101,21 @@ def login_user():
             
             var = session['id']
 
-            return render_template('index.html', var=var)
+            return redirect('/')
     var = "Account error"
     return render_template('index.html', var=var)
 
 @app.route('/logout')
 def logout():
-    if session['isAdmin']:
-        app.config['MYSQL_USER'] = 'Customer'
-        app.config['MYSQL_PASSWORD'] = userpass
-        session.pop('isAdmin', False)
-    session.pop('loggedin', None)
-    session.pop('id', None)
-    session.pop('username', None)
+    try:
+        if session['isAdmin']:
+            app.config['MYSQL_USER'] = 'Customer'
+            app.config['MYSQL_PASSWORD'] = userpass
+            session.pop('isAdmin', False)
+    except:
+        session.pop('loggedin', None)
+        session.pop('id', None)
+        session.pop('username', None)
     return redirect('/')
 
 @app.route('/Addproduct', methods=['POST', 'GET'])
@@ -200,12 +203,26 @@ def editProduct():
     
 @app.route('/checkout')
 def checkOut():
+    amount = 1
     cart_array_cookie = json.loads(request.cookies.get('cartArray'))
     print("---------------",cart_array_cookie)
-    # Parse the JSON string to get the cartArray
+    order_id = db.insert_order(mysql, session['id'], datetime.now())
+    print("---------- ORDERID", order_id)
+    total_price = 0
+    cart_array_cookie_nodup = list(dict.fromkeys(cart_array_cookie))
+    # [[product_id, cart_array_cookie.count(product_id)] for product_id in set(cart_array_cookie)]
+    occurrences = Counter(cart_array_cookie)
+    for product_id in cart_array_cookie_nodup:
 
-    # You can now use 'cart_array' in your template or logic
-    return render_template('index.html', var=cart_array_cookie)
+        product = db.get_product(mysql, product_id)
+        
+        amount = int(occurrences[str(product_id)])
+        db.insert_orderProduct(mysql, session['id'],order_id, product['product_id'], product['product_name'], product['product_price'], amount, amount * product['product_price'])
+        total_price  += amount*product['product_price']
+
+    db.update_order(mysql, order_id, total_price)
+    checkOut = db.get_product_from_order(mysql, order_id)
+    return render_template('order_conf.html',checkOut=checkOut)
     
     
 if __name__ == "__main__":

@@ -19,6 +19,12 @@ def get_product(mysql,product_id):
     product = cur.fetchone()
     return product
 
+def get_product_from_order(mysql, order_id):
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute('SELECT * FROM OrderProducts WHERE order_id = % s', (order_id,))
+    products = cur.fetchall()
+    return products
+
 def get_user(mysql,email):
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cur.execute('SELECT * FROM Users WHERE email = % s', (email,))
@@ -38,6 +44,27 @@ def insert_user(mysql,email, first_name, last_name, password, date_of_birth):
         ,(email, first_name, last_name, password, date_of_birth,))
     mysql.connection.commit()
 
+def insert_order(mysql, customer_id, date_of_purchase):
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("INSERT INTO Orders (customer_id, date_of_purchase, total_price) VALUES (%s,%s,%s)"
+        ,(customer_id, date_of_purchase, 0,))
+    mysql.connection.commit()
+    return cur.execute('select last_insert_id() from Orders')
+
+
+def insert_orderProduct(mysql,customer_id, order_id, product_id, product_name, product_price, amount, total_price):
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("INSERT INTO OrderProducts (customer_id, order_id, product_id, product_name, product_price, amount, total_price) VALUES (%s,%s,%s,%s,%s,%s,%s)"
+        ,(customer_id,order_id, product_id, product_name, product_price, amount, total_price,))
+    mysql.connection.commit()
+
+
+def update_order(mysql, order_id, total_price):
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("UPDATE Orders SET total_price =%s Where order_id= %s", (total_price, order_id,))
+    mysql.connection.commit()
+
+
 def update_product(mysql, product_id, product_name, price, stock, last_restock_date, totalStock):
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cur.execute("UPDATE Products SET product_name = %s, product_price = %s, product_available_amount = %s, product_total_amount = %s  WHERE product_id = %s "
@@ -45,7 +72,6 @@ def update_product(mysql, product_id, product_name, price, stock, last_restock_d
     mysql.connection.commit()
 
 
-    
 def check_email(mysql,email):
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cur.execute("SELECT count(email) FROM Users WHERE email= %s", (email,))
