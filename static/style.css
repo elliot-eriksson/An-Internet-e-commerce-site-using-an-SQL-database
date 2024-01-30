@@ -1,6 +1,14 @@
-#register{
+/* #register{
     visibility: hidden;
-}
+} */
 #login{
     visibility: hidden;
 }
+
+/* #collapseExample {
+    display: none;
+  }
+
+#collapseExample.show{
+    display: hidden;
+  } */

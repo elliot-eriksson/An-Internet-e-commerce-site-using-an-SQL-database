@@ -1,50 +1,77 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sat Jul 25 13:34:18 2020
-
-@author: hp
-"""
-
-import pymysql
 import encrypt as enc
 import MySQLdb.cursors
-#import aws_credentials as rds
-# print("Username : "),
-# username = input(),
-# print("Password : "),
-# password = input()
-# conn = pymysql.connect(
-#         host= 'd0018e-1.c38ei448gz7c.eu-north-1.rds.amazonaws.com', #endpoint link
-#         port = 3306, # 3306
-#         # user = username, # admin
-#         # password = password, #adminadmin
-#         db = 'D0018E1', #test
 
-#         user = 'admin',
-#         password = 'Potatis1'
-#         )
+def select_all_users(mysql):
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute('SELECT * FROM Users')
+    users = cur.fetchall()
+    return users
 
-#Table Creation
-# cursor=conn.cursor()
-# create_table="""
-# create table Details (name varchar(200),email varchar(200),comment varchar(200),gender varchar(20) )
-# """
-# cursor.execute(create_table)
+def select_products(mysql):
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute('SELECT * FROM Products')
+    products = cur.fetchall()
+    return products
+
+def get_product(mysql,product_id):
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute('SELECT * FROM Products WHERE product_id = % s', (product_id,))
+    product = cur.fetchone()
+    return product
+
+def get_product_from_order(mysql, order_id):
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute('SELECT * FROM OrderProducts WHERE order_id = % s', (order_id,))
+    products = cur.fetchall()
+    return products
 
 def get_user(mysql,email):
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cur.execute('SELECT * FROM Users WHERE email = % s', (email,))
-    test = cur.fetchone()
-    return test
+    user = cur.fetchone()
+    return user
         
+
+def insert_product(mysql, product_name, price, stock, last_restock_date, image_address1):
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("INSERT INTO Products (product_name, product_price, product_available_amount, product_total_amount, last_restock_date, image_address1) VALUES (%s,%s,%s,%s,%s,%s)"
+        ,(product_name, price, stock, stock, last_restock_date, image_address1,))
+    mysql.connection.commit()
 
 def insert_user(mysql,email, first_name, last_name, password, date_of_birth):
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cur.execute("INSERT INTO Users (email, first_name, last_name, password, date_of_birth) VALUES (%s,%s,%s,%s,%s)"
         ,(email, first_name, last_name, password, date_of_birth,))
-    cur.commit()
+    mysql.connection.commit()
 
-    
+def insert_order(mysql, customer_id, date_of_purchase):
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("INSERT INTO Orders (customer_id, date_of_purchase, total_price) VALUES (%s,%s,%s)"
+        ,(customer_id, date_of_purchase, 0,))
+    mysql.connection.commit()
+    return cur.execute('select last_insert_id() from Orders')
+
+
+def insert_orderProduct(mysql,customer_id, order_id, product_id, product_name, product_price, amount, total_price):
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("INSERT INTO OrderProducts (customer_id, order_id, product_id, product_name, product_price, amount, total_price) VALUES (%s,%s,%s,%s,%s,%s,%s)"
+        ,(customer_id,order_id, product_id, product_name, product_price, amount, total_price,))
+    mysql.connection.commit()
+
+
+def update_order(mysql, order_id, total_price):
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("UPDATE Orders SET total_price =%s Where order_id= %s", (total_price, order_id,))
+    mysql.connection.commit()
+
+
+def update_product(mysql, product_id, product_name, price, stock, last_restock_date, totalStock):
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("UPDATE Products SET product_name = %s, product_price = %s, product_available_amount = %s, product_total_amount = %s, last_restock_date = %s WHERE product_id = %s "
+        ,(product_name, price, stock, totalStock, last_restock_date, product_id,))
+    mysql.connection.commit()
+
+
 def check_email(mysql,email):
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cur.execute("SELECT count(email) FROM Users WHERE email= %s", (email,))
@@ -66,3 +93,4 @@ def check_credentails(mysql, email, password):
     for element in checkPass:
         currentPass = element['password']
     return enc.decryptPassword(password, currentPass)
+
