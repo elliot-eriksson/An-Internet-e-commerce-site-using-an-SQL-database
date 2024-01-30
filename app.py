@@ -175,41 +175,35 @@ def editProduct():
         # try:
             if session['isAdmin']:
                 product_id = request.form['product_id']
-                print("PRODUCT_ID", product_id)
                 product = db.get_product(mysql, product_id)
-                print("PRODUCT", product)
+                
                 product_name = request.form['product_name']
                 if product_name == '' or product_name is None:
                     product_name = product['product_name']
+                
                 price = request.form['price']
                 if price == "" or price is None:
                     price = 0
-                if price <= 0:
+                if int(price) <= 0:
                     price = product['product_price']  
-                stock = request.form['stock']
 
+                stock = request.form['stock']
                 if stock == "" or stock is None:
                     stock = 0
-                    print("",stock)
-                    last_restock_date = None
-                elif int(stock) > 0:
-                    last_restock_date = datetime.now()
-                else:
-                    last_restock_date = None
-                if price is None or int(stock) == 0:
+
+                if int(stock) <= 0 :
                     stock = product['product_available_amount']
                     last_restock_date = product['last_restock_date']
                     totalStock = product['product_total_amount']
-                elif int(stock) < 0:
-                    var = "Cant enter negative amount of stock"
-                    return render_template('admin.html', var=var)
                 else:
-                    stock = int(stock) + product['product_available_amount']
                     totalStock = int(stock) + product['product_total_amount']
+                    stock = int(stock) + product['product_available_amount']
+                    last_restock_date = datetime.now()
 
                 db.update_product(mysql, product_id, product_name, price, stock, last_restock_date, totalStock)
                 var = "changed"
             return render_template('admin.html', var=var)
+    
     
 @app.route('/checkout')
 def checkOut():
