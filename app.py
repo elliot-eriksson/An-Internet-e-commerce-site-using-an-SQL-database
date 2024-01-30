@@ -182,8 +182,10 @@ def editProduct():
                 if product_name == '' or product_name is None:
                     product_name = product['product_name']
                 price = request.form['price']
-                if price is None or int(price) <= 0:
-                    price = product['price']  
+                if price == "" or price is None:
+                    price = 0
+                if price <= 0:
+                    price = product['product_price']  
                 stock = request.form['stock']
 
                 if stock == "" or stock is None:
@@ -194,11 +196,11 @@ def editProduct():
                     last_restock_date = datetime.now()
                 else:
                     last_restock_date = None
-                if price is None or stock == 0:
+                if price is None or int(stock) == 0:
                     stock = product['product_available_amount']
                     last_restock_date = product['last_restock_date']
                     totalStock = product['product_total_amount']
-                elif stock < 0:
+                elif int(stock) < 0:
                     var = "Cant enter negative amount of stock"
                     return render_template('admin.html', var=var)
                 else:
