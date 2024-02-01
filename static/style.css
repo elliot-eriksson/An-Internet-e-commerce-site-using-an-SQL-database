@@ -1,14 +1,39 @@
-/* #register{
-    visibility: hidden;
-} */
-#login{
-    visibility: hidden;
+body{
+  margin: 0;
 }
 
-/* #collapseExample {
-    display: none;
-  }
+.container{
+  width: 900px;
+  max-width: 90vw; 
+  margin: auto; 
+  text-align: center;
 
-#collapseExample.show{
-    display: hidden;
-  } */
+}
+svg{
+  width: 30px;
+}
+header{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 0;
+
+
+}
+header .icon-cart{
+  position: relative;
+}
+header .icon-cart span{
+  display: flex;
+  width: 30px;
+  height: 30px;
+  background-color: red;
+  justify-content: center;
+  align-items: center;
+  color: #fff;
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  right: -20px;
+}
+/*----------------------CART ------------- */

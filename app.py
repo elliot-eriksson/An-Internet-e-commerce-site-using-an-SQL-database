@@ -207,7 +207,7 @@ def editProduct():
     
 @app.route('/checkout')
 def checkOut():
-    cart_array_cookie = json.loads(request.cookies.get('cartArray'))
+    cart_array_cookie = json.loads(request.cookies.get('checkArray'))
     print("---------------",cart_array_cookie)
     order_id = db.insert_order(mysql, session['id'], datetime.now())
     print("---------- ORDERID", order_id)
@@ -226,7 +226,7 @@ def checkOut():
     checkOut = db.get_product_from_order(mysql, order_id)
     return render_template('order_conf.html',checkOut=checkOut)
 
-@app.route('/shoppingcart')
+@app.route('/shoppingcart', methods=['POST'])
 def shoppingcart():
     cart_array_cookie = json.loads(request.cookies.get('cartArray'))
     cart_array_cookie_nodup = list(dict.fromkeys(cart_array_cookie))
@@ -237,6 +237,7 @@ def shoppingcart():
         product["amount"] = int(occurrences[str(product_id)])
         product["total_price"]  = int(product["amount"])*int(product['product_price'])
         shoppingcart.append(product)
+    return jsonify(shoppingcart)
 
     return render_template('shopping_cart.html',shoppingcart=shoppingcart)
 

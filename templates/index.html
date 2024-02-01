@@ -70,8 +70,18 @@
 
 
   <div class="container">
+    <header>
+    <div class="title">Product List</div>
+    <div class="icon-cart">
+      <svg onclick="" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 4h1.5L9 16m0 0h8m-8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm-8.5-3h9.3L19 7H7.3"/>
+      </svg>
+      <span id="NumOfItems">0</span>
+    </div>
+  </header>
     <div class="row">
       {% for product in productTest %}
+      
       <div class="col-md-3 mt-3">
         <div class="card">
           <img src="{{ url_for('static', filename=product['image_address1']) }}" alt="{{product['product_name']}}">
@@ -81,16 +91,26 @@
             <p class="text-center">Price ${{product['product_price']}}</p>
           </div>
           <div class="card-footer">
-            <a href="#" class="float-left btn btn-sm btn-primary">details</a>
-            <a onclick="cartSession('{{product['product_id']}}')" class="float-right btn btn-sm btn-warning">Add to cart</a>
-
+            <a href="#" class="btn btn-sm btn-primary float-left">details</a>
+            <a onclick="cartSession('{{product['product_id']}}', '{{product['product_name']}}', '{{product['product_price']}}')" class="btn btn-sm btn-warning float-right">Add to cart</a>
           </div>
         </div>
       </div>
       {% endfor %}
     </div>
   </div>
-  
+
+  <div class="cartTab">
+    <h1>Shopping Cart</h1>
+    <div class="listCart">
+        
+    </div>
+    <div class="btn">
+        <button class="close">CLOSE</button>
+        <button onclick="clearCart()" class="checkOut">Check Out</button>
+    </div>
+</div>
+
 
   <div id="register" class="col-sm-4">
     <form action="/insert new customer" method="post">
@@ -139,13 +159,12 @@
     <hr>
 </div>
 <form action="/checkout">
-  <button onclick = "setCartCookie()" type="submit" name="users" class="btn btn-danger">check out</button>
+  <button onclick = "setCheckCookie()" type="submit" name="users" class="btn btn-danger">check out</button>
 </form>
 
 <form action="/shoppingcart">
   <button onclick = "setCartCookie()" type="submit" name="users" class="btn btn-danger">Shopping cart</button>
 </form>  
-
 
 
 <div class="mt-5 p-4 bg-dark text-white text-center">
