@@ -105,9 +105,24 @@ def update_shoppingCartItem(mysql, customer_id, session_id, product_id, quantity
     if customer_id is None:
         cur.execute('UPDATE Cart SET quantity = %s, updatedAt = %s, price =%s WHERE session_id = %s and product_id = %s', (quantity, updatedAt,price,session_id,product_id,))
     else:
-        cur.execute('SELECT * FROM Cart WHERE customer_id = %s and product_id = %s', (session_id,product_id,))
-    item = cur.fetchone()
-    return item
+        cur.execute('UPDATE Cart SET quantity = %s, updatedAt = %s, price =%s WHERE customer_id = %s and product_id = %s', (quantity, updatedAt,price,customer_id,product_id,))
+    mysql.connection.commit()
+
+def delete_shoppingCartItem(mysql, customer_id, session_id, product_id):
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    if customer_id is None:
+        cur.execute ('DELETE FROM Cart WHERE session_id = %s and product_id = %s', (session_id, product_id,))
+    else:
+        cur.execute ('DELETE FROM Cart WHERE customer_id = %s and product_id = %s', (customer_id, product_id,))
+    mysql.connection.commit()
+
+def delete_shoppingCart(mysql, customer_id, session_id):
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    if customer_id is None:
+        cur.execute ('DELETE FROM Cart WHERE session_id = %s', (session_id,))
+    else:
+        cur.execute ('DELETE FROM Cart WHERE customer_id = %s', (customer_id,))
+    mysql.connection.commit()
 
 def check_email(mysql,email):
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
