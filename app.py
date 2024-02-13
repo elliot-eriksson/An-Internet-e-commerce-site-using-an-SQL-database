@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, flash, redirect,url_for, jsonify, session 
 from flask_mysqldb import MySQL
 from datetime import datetime
+import random
 import rds_db as db
 import encrypt as enc
 from werkzeug.utils import secure_filename
@@ -28,6 +29,11 @@ mysql = MySQL(app)
 @app.route('/')
 @app.route('/index.html')
 def index():
+    try:
+        if session['id']:
+            1==1
+    except:
+        session['id'] = random.randrange(10000000,99999999)
     productTest = db.select_products(mysql)
     return render_template('index.html', productTest=productTest)
 
@@ -241,15 +247,41 @@ def checkOut():
 
 #     return render_template('shopping_cart.html',shoppingcart=shoppingcart)
 
-@app.route('/add-to-cart', methods=['POST'])
-def add_product_to_cart():
-    productId = request.form.get('product_id')
-    productInCart = db.get_product_in_cart(mysql, productId)
-    if productInCart is None:
-        productInfo = db.get_product(mysql, productId)
-        db.insert_shoppingCart(mysql, customer_id, )
+# @app.route('/add-to-cart', methods=['POST'])
+# def add_product_to_cart():
+#     productId = request.form.get('product_id')
+#     productInCart = db.get_product_in_cart(mysql, productId)
+#     if productInCart is None:
+#         productInfo = db.get_product(mysql, productId)
+#         db.insert_shoppingCart(mysql, customer_id, )
 
-    db.insert_shoppingCart
+#     db.insert_shoppingCart
+
+@app.route('/add-to-cart', methods=['POST'])
+def addToShoppingCart():
+    productId = request.form['product_id']
+    amount = request.form['amount']
+
+    try:
+        if session['loggedin']:
+            customerId = session['id']
+            sessionID = None
+    except:
+        customerId = None
+        sessionID = session['id']
+
+    productInCart = db.get_shoppingCartItem(mysql, customerId, sessionID, productId)
+    if productInCart:
+        quantity = productInCart ['quantity'] + amount
+        product = db.get_product(mysql, productId)
+        price = product['price']
+        db.update_shoppingCartItem(mysql, customerId, sessionID, productId,quantity,datetime.now(),price)
+    else:
+        quantity = amount
+        product = db.get_product(mysql, productId)
+        price = product['price']
+        db.insert_shoppingCart(mysql, customerId, sessionID, productId,quantity,datetime.now(),price)
     
+
 if __name__ == "__main__":
     app.run(port=5002, debug=True)

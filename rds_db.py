@@ -13,6 +13,7 @@ def select_products(mysql):
     products = cur.fetchall()
     return products
 
+
 def get_product(mysql,product_id):
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cur.execute('SELECT * FROM Products WHERE product_id = % s', (product_id,))
@@ -75,10 +76,10 @@ def insert_order(mysql, customer_id, date_of_purchase):
     mysql.connection.commit()
     return cur.execute('select last_insert_id() from Orders')
 
-def insert_shoppingCart(mysql, customer_id, session_id, product_id, price, product_amount, createdAt, updatedAt):
+def insert_shoppingCart(mysql, customer_id, session_id, product_id, price, product_amount, updatedAt):
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    cur.execute("INSERT INTO Cart (customer_id, session_id, product_id, price, quantity, createdAt, updatedAt) VALUES (%s,%s,%s,%s,%s,%s,%s)"
-        ,(customer_id, session_id, product_id, price, product_amount, createdAt, updatedAt,))
+    cur.execute("INSERT INTO Cart (customer_id, session_id, product_id, price, quantity, updatedAt) VALUES (%s,%s,%s,%s,%s,%s)"
+        ,(customer_id, session_id, product_id, price, product_amount, updatedAt,))
     mysql.connection.commit()
 
 def insert_orderProduct(mysql,customer_id, order_id, product_id, product_name, product_price, amount, total_price):
