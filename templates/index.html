@@ -92,7 +92,13 @@
           </div>
           <div class="card-footer">
             <a href="#" class="btn btn-sm btn-primary float-left">details</a>
-            <a onclick="cartSession('{{product['product_id']}}', '{{product['product_name']}}', '{{product['product_price']}}')" class="btn btn-sm btn-warning float-right">Add to cart</a>
+            <div class="add-to-cart">
+              <input type="hidden" name="product_id" value="{{ product['product_id'] }}">
+              <input type="text" class="product_quantity" name="quantity" value="1" size="2">
+              <input type="submit" value="Add to Cart" class="default-btn">
+            </div>
+            <!-- <a onclick="cartSession('{{product['product_id']}}', '{{product['product_name']}}', '{{product['product_price']}}')" class="btn btn-sm btn-warning float-right">Add to cart</a> -->
+
           </div>
         </div>
       </div>

@@ -226,21 +226,30 @@ def checkOut():
     checkOut = db.get_product_from_order(mysql, order_id)
     return render_template('order_conf.html',checkOut=checkOut)
 
-@app.route('/shoppingcart', methods=['POST'])
-def shoppingcart():
-    cart_array_cookie = json.loads(request.cookies.get('cartArray'))
-    cart_array_cookie_nodup = list(dict.fromkeys(cart_array_cookie))
-    occurrences = Counter(cart_array_cookie)
-    shoppingcart = []
-    for product_id in cart_array_cookie_nodup:
-        product = db.get_product(mysql, product_id)
-        product["amount"] = int(occurrences[str(product_id)])
-        product["total_price"]  = int(product["amount"])*int(product['product_price'])
-        shoppingcart.append(product)
-    return jsonify(shoppingcart)
+# @app.route('/shoppingcart', methods=['POST'])
+# def shoppingcart():
+#     cart_array_cookie = json.loads(request.cookies.get('cartArray'))
+#     cart_array_cookie_nodup = list(dict.fromkeys(cart_array_cookie))
+#     occurrences = Counter(cart_array_cookie)
+#     shoppingcart = []
+#     for product_id in cart_array_cookie_nodup:
+#         product = db.get_product(mysql, product_id)
+#         product["amount"] = int(occurrences[str(product_id)])
+#         product["total_price"]  = int(product["amount"])*int(product['product_price'])
+#         shoppingcart.append(product)
+#     return jsonify(shoppingcart)
 
-    return render_template('shopping_cart.html',shoppingcart=shoppingcart)
+#     return render_template('shopping_cart.html',shoppingcart=shoppingcart)
 
+@app.route('/add-to-cart', methods=['POST'])
+def add_product_to_cart():
+    productId = request.form.get('product_id')
+    productInCart = db.get_product_in_cart(mysql, productId)
+    if productInCart is None:
+        productInfo = db.get_product(mysql, productId)
+        db.insert_shoppingCart(mysql, customer_id, )
+
+    db.insert_shoppingCart
     
 if __name__ == "__main__":
     app.run(port=5002, debug=True)

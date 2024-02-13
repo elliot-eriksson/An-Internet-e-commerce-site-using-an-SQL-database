@@ -19,6 +19,12 @@ def get_product(mysql,product_id):
     product = cur.fetchone()
     return product
 
+def get_product_in_cart(mysql, product_id):
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute('SELECT * FROM Cart WHERE product_id = % s', (product_id,))
+    product = cur.fetchone()
+    return product
+
 def get_product_from_order(mysql, order_id):
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cur.execute('SELECT * FROM OrderProducts WHERE order_id = % s', (order_id,))
@@ -30,7 +36,25 @@ def get_user(mysql,email):
     cur.execute('SELECT * FROM Users WHERE email = % s', (email,))
     user = cur.fetchone()
     return user
-        
+
+def get_shoppingCart(mysql,customer_id,session_id):
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    if customer_id is None:
+        cur.execute('SELECT * FROM Cart WHERE session_id = % s', (session_id,))
+    else:
+        cur.execute('SELECT * FROM Cart WHERE customer_id = % s', (customer_id,))
+    cart = cur.fetchall()
+    return cart
+
+def get_shoppingCartItem(mysql, customer_id, session_id, product_id):
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    if customer_id is None:
+        cur.execute('SELECT * FROM Cart WHERE session_id = %s and product_id = %s', (session_id,product_id,))
+    else:
+        cur.execute('SELECT * FROM Cart WHERE customer_id = %s and product_id = %s', (session_id,product_id,))
+    item = cur.fetchone()
+    return item
+
 
 def insert_product(mysql, product_name, price, stock, last_restock_date, image_address1):
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
@@ -51,6 +75,11 @@ def insert_order(mysql, customer_id, date_of_purchase):
     mysql.connection.commit()
     return cur.execute('select last_insert_id() from Orders')
 
+def insert_shoppingCart(mysql, customer_id, session_id, product_id, price, product_amount, createdAt, updatedAt):
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("INSERT INTO Cart (customer_id, session_id, product_id, price, quantity, createdAt, updatedAt) VALUES (%s,%s,%s,%s,%s,%s,%s)"
+        ,(customer_id, session_id, product_id, price, product_amount, createdAt, updatedAt,))
+    mysql.connection.commit()
 
 def insert_orderProduct(mysql,customer_id, order_id, product_id, product_name, product_price, amount, total_price):
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
@@ -71,6 +100,14 @@ def update_product(mysql, product_id, product_name, price, stock, last_restock_d
         ,(product_name, price, stock, totalStock, last_restock_date, product_id,))
     mysql.connection.commit()
 
+def update_shoppingCartItem(mysql, customer_id, session_id, product_id, quantity, updatedAt,price):
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    if customer_id is None:
+        cur.execute('UPDATE Cart SET quantity = %s, updatedAt = %s, price =%s WHERE session_id = %s and product_id = %s', (quantity, updatedAt,price,session_id,product_id,))
+    else:
+        cur.execute('SELECT * FROM Cart WHERE customer_id = %s and product_id = %s', (session_id,product_id,))
+    item = cur.fetchone()
+    return item
 
 def check_email(mysql,email):
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
