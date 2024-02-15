@@ -52,7 +52,7 @@ def get_shoppingCartItem(mysql, customer_id, session_id, product_id):
     if customer_id is None:
         cur.execute('SELECT * FROM Cart WHERE session_id = %s and product_id = %s', (session_id,product_id,))
     else:
-        cur.execute('SELECT * FROM Cart WHERE customer_id = %s and product_id = %s', (session_id,product_id,))
+        cur.execute('SELECT * FROM Cart WHERE customer_id = %s and product_id = %s', (customer_id,product_id,))
     item = cur.fetchone()
     return item
 
@@ -76,10 +76,10 @@ def insert_order(mysql, customer_id, date_of_purchase):
     mysql.connection.commit()
     return cur.execute('select last_insert_id() from Orders')
 
-def insert_shoppingCart(mysql, customer_id, session_id, product_id, price, product_amount, updatedAt):
+def insert_shoppingCart(mysql, customer_id, session_id, product_id, product_amount, updatedAt):
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    cur.execute("INSERT INTO Cart (customer_id, session_id, product_id, price, quantity, updatedAt) VALUES (%s,%s,%s,%s,%s,%s)"
-        ,(customer_id, session_id, product_id, price, product_amount, updatedAt,))
+    cur.execute("INSERT INTO Cart (customer_id, session_id, product_id, quantity, updatedAt) VALUES (%s,%s,%s,%s,%s)"
+        ,(customer_id, session_id, product_id, product_amount, updatedAt,))
     mysql.connection.commit()
 
 def insert_orderProduct(mysql,customer_id, order_id, product_id, product_name, product_price, amount, total_price):
@@ -88,12 +88,17 @@ def insert_orderProduct(mysql,customer_id, order_id, product_id, product_name, p
         ,(customer_id,order_id, product_id, product_name, product_price, amount, total_price,))
     mysql.connection.commit()
 
+def insert_review(mysql, product_id, customer_id, parent_id, publishedAt, purchase_date, rating, review):
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("INSERT INTO Reviews (product_id, customer_id, parent_id, publishedAt, purchase_date, rating, review) VALUES (%s,%s,%s,%s,%s,%s,%s)"
+        ,(product_id,customer_id, parent_id, publishedAt, purchase_date, rating, review,))
+    mysql.connection.commit()
+
 
 def update_order(mysql, order_id, total_price):
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cur.execute("UPDATE Orders SET total_price =%s Where order_id= %s", (total_price, order_id,))
     mysql.connection.commit()
-
 
 def update_product(mysql, product_id, product_name, price, stock, last_restock_date, totalStock):
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
@@ -101,12 +106,12 @@ def update_product(mysql, product_id, product_name, price, stock, last_restock_d
         ,(product_name, price, stock, totalStock, last_restock_date, product_id,))
     mysql.connection.commit()
 
-def update_shoppingCartItem(mysql, customer_id, session_id, product_id, quantity, updatedAt,price):
+def update_shoppingCartItem(mysql, customer_id, session_id, product_id, quantity, updatedAt):
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     if customer_id is None:
-        cur.execute('UPDATE Cart SET quantity = %s, updatedAt = %s, price =%s WHERE session_id = %s and product_id = %s', (quantity, updatedAt,price,session_id,product_id,))
+        cur.execute('UPDATE Cart SET quantity = %s, updatedAt = %sWHERE session_id = %s and product_id = %s', (quantity, updatedAt,session_id,product_id,))
     else:
-        cur.execute('UPDATE Cart SET quantity = %s, updatedAt = %s, price =%s WHERE customer_id = %s and product_id = %s', (quantity, updatedAt,price,customer_id,product_id,))
+        cur.execute('UPDATE Cart SET quantity = %s, updatedAt = %sWHERE customer_id = %s and product_id = %s', (quantity, updatedAt,customer_id,product_id,))
     mysql.connection.commit()
 
 def delete_shoppingCartItem(mysql, customer_id, session_id, product_id):

@@ -91,11 +91,15 @@
             <p class="text-center">Price ${{product['product_price']}}</p>
           </div>
           <div class="card-footer">
-            <a href="#" class="btn btn-sm btn-primary float-left">details</a>
-            <div class="add-to-cart">
-              <input type="hidden" name="product_id" value="{{ product['product_id'] }}">
-              <input type="text" class="product_quantity" name="quantity" value="1" size="2">
-              <input type="submit" value="Add to Cart" class="default-btn">
+            <div class="col-sm3">
+            <a href="#" class="btn btn-primary w-100">Details</a>
+            <div class="Add-to-cart">
+              <form action="/add-to-cart" method="post">
+                <input type="hidden" name="product_id" value="{{ product['product_id'] }}">
+                <input type="text" class="product_quantity" name="quantity" value="1" size="2">
+                <input onclick="cartSession()" type="submit" value="Add to cart" class="btn btn-warning">
+              </form>
+            </div>
             </div>
             <!-- <a onclick="cartSession('{{product['product_id']}}', '{{product['product_name']}}', '{{product['product_price']}}')" class="btn btn-sm btn-warning float-right">Add to cart</a> -->
 
@@ -108,11 +112,14 @@
 
   <div class="cartTab">
     <h1>Shopping Cart</h1>
+    {% for product in cartItems %}
     <div class="listCart">
-        
+      <h5 class="text-center">{{product['product_name']}}</h5>
+      <p class="text-center">Price ${{product['product_price']}}</p>
     </div>
+    {% endfor %}
     <div class="btn">
-        <button class="close">CLOSE</button>
+        <a href="shopping_cart.html" class="btn-success">Cart</a>
         <button onclick="clearCart()" class="checkOut">Check Out</button>
     </div>
 </div>
@@ -164,9 +171,7 @@
     <br>
     <hr>
 </div>
-<form action="/checkout">
-  <button onclick = "setCheckCookie()" type="submit" name="users" class="btn btn-danger">check out</button>
-</form>
+
 
 <form action="/shoppingcart">
   <button onclick = "setCartCookie()" type="submit" name="users" class="btn btn-danger">Shopping cart</button>

@@ -158,11 +158,6 @@ def Addproduct():
         #     var = "Access Denied"
         #     return render_template('index.html', var=var)
 
-@app.route('/Add to cart', methods=['POST'])
-def addToCart():
-    var = "product Added"
-    productTest = db.select_products(mysql)
-    return render_template('index.html', productTest=productTest, var=var)
 
 @app.route('/edit_product', methods=['POST','GET'])
 def editProduct():
@@ -213,24 +208,29 @@ def editProduct():
     
 @app.route('/checkout')
 def checkOut():
-    cart_array_cookie = json.loads(request.cookies.get('checkArray'))
-    print("---------------",cart_array_cookie)
-    order_id = db.insert_order(mysql, session['id'], datetime.now())
-    print("---------- ORDERID", order_id)
-    total_price = 0
-    cart_array_cookie_nodup = list(dict.fromkeys(cart_array_cookie))
-    occurrences = Counter(cart_array_cookie)
-    for product_id in cart_array_cookie_nodup:
+    try:
+        if session['loggedin']:
+            customerId = session['id']
+            sessionID = None
+    except:
+        return redirect('/l')
+    
+    orderID = db.insert_order(mysql, customerId, datetime.now())
+    cart = db.get_shoppingCart(mysql, customerId, sessionID)
+    totalPrice = 0
+#-------------- Insert product updated info ------------------------- #
+    for item in cart:
+        products = db.get_product(mysql,item['product_id'])
+        item['price'] = products['product_price']
+        item['product_name'] = products['product_name']
+        item['TotalPrice'] = int(item['price']) * int(item['quantity'])
+        totalPrice = totalPrice + item['TotalPrice']
+        db.insert_orderProduct(mysql, customerId, orderID, item['product_id'], item['product_name'], item['price'], item['quantity'], item['TotalPrice'])
+    db.update_order(mysql, orderID, totalPrice)
 
-        product = db.get_product(mysql, product_id)
-        
-        amount = int(occurrences[str(product_id)])
-        db.insert_orderProduct(mysql, session['id'],order_id, product['product_id'], product['product_name'], product['product_price'], amount, amount * product['product_price'])
-        total_price  += amount*product['product_price']
-
-    db.update_order(mysql, order_id, total_price)
-    checkOut = db.get_product_from_order(mysql, order_id)
-    return render_template('order_conf.html',checkOut=checkOut)
+    checkOut = db.get_product_from_order(mysql, orderID)
+    
+    return render_template('order_conf.html',checkOut=checkOut,order_product_id = orderID)
 
 # @app.route('/shoppingcart', methods=['POST'])
 # def shoppingcart():
@@ -260,7 +260,8 @@ def checkOut():
 @app.route('/add-to-cart', methods=['POST'])
 def addToShoppingCart():
     productId = request.form['product_id']
-    amount = request.form['amount']
+    amount = request.form['quantity']
+    print("hej")
 
     try:
         if session['loggedin']:
@@ -269,19 +270,46 @@ def addToShoppingCart():
     except:
         customerId = None
         sessionID = session['id']
-
+    print("Customer ID     " ,customerId)
+    print("Session ID      " ,sessionID)
+    print("product ID", productId)
     productInCart = db.get_shoppingCartItem(mysql, customerId, sessionID, productId)
+    print(productInCart)
     if productInCart:
-        quantity = productInCart ['quantity'] + amount
-        product = db.get_product(mysql, productId)
-        price = product['price']
-        db.update_shoppingCartItem(mysql, customerId, sessionID, productId,quantity,datetime.now(),price)
+        print("har produkt")
+        quantity = productInCart ['quantity'] + int(amount)
+        db.update_shoppingCartItem(mysql, customerId, sessionID, productId,quantity,datetime.now())
     else:
+        print("har inte  produkt")
         quantity = amount
-        product = db.get_product(mysql, productId)
-        price = product['price']
-        db.insert_shoppingCart(mysql, customerId, sessionID, productId,quantity,datetime.now(),price)
-    
+        db.insert_shoppingCart(mysql, customerId, sessionID, productId,quantity,datetime.now())
+    return redirect('/')
+
+@app.route('/shopping_cart.html')
+def cartPage():
+    try:
+        if session['loggedin']:
+            customerId = session['id']
+            sessionID = None
+    except:
+        customerId = None
+        sessionID = session['id']
+    cartItems = db.get_shoppingCart(mysql, customerId, sessionID)
+    for item in cartItems:
+        print(item)
+        products = db.get_product(mysql,item['product_id'])
+        item['price'] = products['product_price']
+        item['product_name'] = products['product_name']
+        item['TotalPrice'] = int(item['price']) * int(item['quantity'])
+
+        
+    return render_template('shopping_cart.html', cartItems = cartItems)
+
 
 if __name__ == "__main__":
     app.run(port=5002, debug=True)
+
+
+@app.route('/review', methods=['POST'])
+def addReview():
+    return
