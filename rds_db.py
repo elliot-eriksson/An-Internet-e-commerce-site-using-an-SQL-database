@@ -114,6 +114,13 @@ def update_shoppingCartItem(mysql, customer_id, session_id, product_id, quantity
         cur.execute('UPDATE Cart SET quantity = %s, updatedAt = %sWHERE customer_id = %s and product_id = %s', (quantity, updatedAt,customer_id,product_id,))
     mysql.connection.commit()
 
+def update_shoppingCart(mysql, customer_id, session_id):
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute('UPDATE Cart SET session_id = NULL, customer_id = %s WHERE session_id = %s', (customer_id, session_id,))
+    mysql.connection.commit()
+
+
+
 def delete_shoppingCartItem(mysql, customer_id, session_id, product_id):
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     if customer_id is None:

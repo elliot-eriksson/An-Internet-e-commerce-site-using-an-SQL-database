@@ -89,6 +89,7 @@
           <div class="card-body">
             <h5 class="text-center">{{product['product_name']}}</h5>
             <p class="text-center">Price ${{product['product_price']}}</p>
+            <p class="text-center">in stock {{product['product_available_amount']}}</p>
           </div>
           <div class="card-footer">
             <div class="col-sm3">
@@ -119,7 +120,7 @@
     </div>
     {% endfor %}
     <div class="btn">
-        <a href="shopping_cart.html" class="btn-success">Cart</a>
+        <a href="shopping_cart.html" class="btn btn-success">View cart</a>
         <button onclick="clearCart()" class="checkOut">Check Out</button>
     </div>
 </div>

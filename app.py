@@ -12,7 +12,6 @@ app = Flask(__name__)
 
 
 app.secret_key = 'your secret key'
-
 app.config['MYSQL_HOST'] = 'd0018e-1.c38ei448gz7c.eu-north-1.rds.amazonaws.com'
 app.config['MYSQL_USER'] = 'Customer'
 print("Password")
@@ -73,6 +72,11 @@ def insert_new_user():
         # password = request.form['password']
         date_of_birth = request.form['date_of_birth']
         db.insert_user(mysql,email,first_name,last_name,password, date_of_birth)
+        account = db.get_user(mysql, email)
+        db.update_shoppingCart(mysql, account['customer_id'], session['id'])
+        session['loggedin'] = True
+        session['id'] = account['customer_id']
+        session['username'] = account['email']
         var = "User created"
         return render_template('index.html', var=var)
 #TODO Implement what will happen when you loggin 
