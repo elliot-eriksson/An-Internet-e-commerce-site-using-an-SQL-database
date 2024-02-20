@@ -61,27 +61,27 @@
                       <p class="mb-0">Reply from {{ answer['name'] }}: {{ answer['review'] }}</p>
                     </li>
                     
-                    <div id="answerShow" class="col-sm-4">
-                        <form action="/reviewAns" method="post">
-                            <input type="hidden" name="product_id" value="{{ product['product_id'] }}">
-                            <input type="hidden" name="parent_id" value="{{ review['review_id'] }}">
-                            
-                            <div class="mb-3">
-                                <label for="review" class="form-label">Anwser:</label>
-                                <input type="text" class="form-control" id="review" placeholder="Enter review" name="review">
-                                <p id="parentID"></p>
-                            </div>
-                            <button type="submit" class="btn btn-primary">Submit answer</button>
-                        </form>
-                    </div>
                     {% endfor %}
                 </ul>
-                <svg onclick="showElement('answerShow') " class="w-6 h-6 text-gray-800 dark:text-white float-end" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                <svg onclick="showElement('{{ review['review_id'] }}') " class="w-6 h-6 text-gray-800 dark:text-white float-end" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M14.5 7H12v-.9a2.1 2.1 0 0 0-1.2-2 1.8 1.8 0 0 0-2 .4L3.8 9a2.2 2.2 0 0 0 0 3.2l5 4.5a1.8 1.8 0 0 0 2 .3 2.1 2.1 0 0 0 1.2-2v-.9h1a2 2 0 0 1 2 2V19a1 1 0 0 0 1.3 1 6.6 6.6 0 0 0-1.8-13Z"/>
                 </svg>  
-              </li>
+                <div id="{{ review['review_id'] }}" class="col-sm-4" style="display: none;">
+                    <form action="/reviewAns" method="post">
+                        <input type="hidden" name="product_id" value="{{ product['product_id'] }}">
+                        <input type="hidden" name="parent_id" value="{{ review['review_id'] }}">
+                        
+                        <div class="mb-3">
+                            <label for="review" class="form-label">Anwser:</label>
+                            <input type="text" class="form-control" id="review" placeholder="Enter review" name="review">
+                            <p id="parentID"></p>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Submit answer</button>
+                    </form>
+                </div>
+            </li>
             
-
+            
             {% endfor %}
           </ul>
         </div>
