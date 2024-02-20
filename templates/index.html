@@ -93,14 +93,19 @@
           </div>
           <div class="card-footer">
             <div class="col-sm3">
-            <a href="#" class="btn btn-primary w-100">Details</a>
-            <div class="Add-to-cart">
-              <form action="/add-to-cart" method="post">
-                <input type="hidden" name="product_id" value="{{ product['product_id'] }}">
-                <input type="text" class="product_quantity" name="quantity" value="1" size="2">
-                <input onclick="cartSession()" type="submit" value="Add to cart" class="btn btn-warning">
-              </form>
-            </div>
+              <div class="View-product">
+                <form action="/view-product" method="get">
+                  <input type="hidden" name="product_id" value="{{ product['product_id'] }}">
+                  <input type="submit" value="View product" class="btn btn-primary w-100">
+                </form>
+              </div>
+              <div class="Add-to-cart">
+                <form action="/add-to-cart" method="post">
+                  <input type="hidden" name="product_id" value="{{ product['product_id'] }}">
+                  <input type="text" class="product_quantity" name="quantity" value="1" size="2">
+                  <input onclick="cartSession()" type="submit" value="Add to cart" class="btn btn-warning">
+                </form>
+              </div>
             </div>
             <!-- <a onclick="cartSession('{{product['product_id']}}', '{{product['product_name']}}', '{{product['product_price']}}')" class="btn btn-sm btn-warning float-right">Add to cart</a> -->
 

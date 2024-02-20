@@ -37,3 +37,14 @@ header .icon-cart span{
   right: -20px;
 }
 /*----------------------CART ------------- */
+
+#reviewShow {
+  display: none;
+}
+#answerShow {
+  display: none;
+}
+
+svg :hover {
+  cursor: pointer;
+}

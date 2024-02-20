@@ -51,6 +51,16 @@ function clearCart(){
   console.log("Cart cleared", cartArray)
 }
 
+function showElement(element){
+  var showElement = document.getElementById(element);
+  if (showElement.style.display === 'none') {
+    showElement.style.display = 'block';
+  } else {
+    showElement.style.display = 'none';
+  }
+  
+}
+
 
 // Call getCartCookie on page load to retrieve the cartArray
 window.onload = function () {
@@ -60,6 +70,16 @@ window.onload = function () {
 
 
 
+// function toggleAnswerShow(parentId) {
+//   var answerShowElement = document.getElementById('answerShow');
+//   if (answerShowElement.style.display === 'none' || answerShowElement.style.display === '') {
+//       answerShowElement.style.display = 'block';
+//       // Här kan du göra något med parentId, till exempel lägga det i en input eller en variabel
+//       document.querySelector('#answerShow input[name="parent_id"]').value = parentId;
+//   } else {
+//       answerShowElement.style.display = 'none';
+//   }
+// }
 
 
 

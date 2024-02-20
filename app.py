@@ -236,31 +236,6 @@ def checkOut():
     
     return render_template('order_conf.html',checkOut=checkOut,order_product_id = orderID)
 
-# @app.route('/shoppingcart', methods=['POST'])
-# def shoppingcart():
-#     cart_array_cookie = json.loads(request.cookies.get('cartArray'))
-#     cart_array_cookie_nodup = list(dict.fromkeys(cart_array_cookie))
-#     occurrences = Counter(cart_array_cookie)
-#     shoppingcart = []
-#     for product_id in cart_array_cookie_nodup:
-#         product = db.get_product(mysql, product_id)
-#         product["amount"] = int(occurrences[str(product_id)])
-#         product["total_price"]  = int(product["amount"])*int(product['product_price'])
-#         shoppingcart.append(product)
-#     return jsonify(shoppingcart)
-
-#     return render_template('shopping_cart.html',shoppingcart=shoppingcart)
-
-# @app.route('/add-to-cart', methods=['POST'])
-# def add_product_to_cart():
-#     productId = request.form.get('product_id')
-#     productInCart = db.get_product_in_cart(mysql, productId)
-#     if productInCart is None:
-#         productInfo = db.get_product(mysql, productId)
-#         db.insert_shoppingCart(mysql, customer_id, )
-
-#     db.insert_shoppingCart
-
 @app.route('/add-to-cart', methods=['POST'])
 def addToShoppingCart():
     productId = request.form['product_id']
@@ -306,14 +281,80 @@ def cartPage():
         item['product_name'] = products['product_name']
         item['TotalPrice'] = int(item['price']) * int(item['quantity'])
 
-        
     return render_template('shopping_cart.html', cartItems = cartItems)
 
+# ------------------- view product and reviews ----------------------------
+@app.route('/view-product', methods=['GET'])
+def viewProduct():
+    
+    productId = request.args['product_id']
+    product = db.get_product(mysql, productId)
+    
+    topreview = db.get_review(mysql, productId, 0)
+    answers = db.get_review(mysql, productId, 1)
+
+    return render_template('productpage.html', product = product, topreview = topreview, answers = answers)
+
+@app.route('/review', methods=['POST'])
+def addReview():
+    productId = request.form['product_id']
+    print(session['loggedin'])
+    # productId = request.args['product_id']
+    # try:
+    product = db.get_product_from_customerorder(mysql, productId, session['id'])
+    if session['loggedin'] and product:
+        # print("Direkt efter IF")
+        order = db.get_order(mysql, product["order_id"])
+        # print("Direkt efter order get")
+        customer_id = session['id']
+        customer  = db.get_user_name(mysql, customer_id)
+        name = customer["first_name"]
+        # print("Direkt efter name get")
+        # name = user["first_name" + "last_name"]
+        parent_id = None
+        publishedAt = datetime.now()
+        purchase_date = order["date_of_purchase"]
+        rating = request.form['rating']
+        review = request.form['review']
+        
+        db.insert_review(mysql, productId, customer_id, parent_id, publishedAt, purchase_date, rating, review, name)
+        print("Direkt efter insert")
+        db.update_productAvrageRating(mysql,productId)
+        print("Direkt efter rating")
+    # except:
+    #     return redirect('/login')
+    return redirect('/view-product')
+
+@app.route('/reviewAns', methods=['POST'])
+def addAnswer():
+    productId = request.form['product_id']
+    parent_id = request.form['parent_id']
+    # try:
+    product = db.get_product_from_customerorder(mysql, productId, session['id'])
+    if session['loggedin'] and product:
+        order = db.get_order(mysql, product["order_id"])
+        customer_id = session['id']
+        publishedAt = datetime.now()
+        purchase_date = order["date_of_purchase"]
+        customer  = db.get_user_name(mysql, customer_id)
+        name = customer["first_name"]
+        rating = None
+        review = request.form['review']
+        db.insert_review(mysql, productId, customer_id, parent_id, publishedAt, purchase_date, rating, review,name)
+    elif session['isAdmin']:
+        customer_id = None
+        parent_id = None
+        publishedAt = datetime.now()
+        purchase_date = None
+        rating = None
+        name = "Admin"
+        review = request.form['review']
+        db.insert_review(mysql, productId, customer_id, parent_id, publishedAt, purchase_date, rating, review, name)
+    # except:
+    #     return redirect('/login')
+    return redirect('/view-product')
 
 if __name__ == "__main__":
     app.run(port=5002, debug=True)
 
 
-@app.route('/review', methods=['POST'])
-def addReview():
-    return

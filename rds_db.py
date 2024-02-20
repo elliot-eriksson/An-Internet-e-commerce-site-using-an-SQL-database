@@ -14,11 +14,19 @@ def select_products(mysql):
     return products
 
 
+
+
 def get_product(mysql,product_id):
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cur.execute('SELECT * FROM Products WHERE product_id = % s', (product_id,))
     product = cur.fetchone()
     return product
+
+def get_order(mysql,order_id):
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute('SELECT * FROM Orders WHERE order_id = % s', (order_id,))
+    order = cur.fetchone()
+    return order
 
 def get_product_in_cart(mysql, product_id):
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
@@ -32,11 +40,41 @@ def get_product_from_order(mysql, order_id):
     products = cur.fetchall()
     return products
 
+def get_product_from_customerorder(mysql, product_id,customer_id):
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute('SELECT * FROM OrderProducts WHERE customer_id = % s and product_id = %s ORDER BY order_product_id DESC', (customer_id, product_id,))
+    product = cur.fetchone()
+    return product
+
 def get_user(mysql,email):
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cur.execute('SELECT * FROM Users WHERE email = % s', (email,))
     user = cur.fetchone()
     return user
+
+def get_user_name(mysql,customer_id):
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute('SELECT first_name FROM Users WHERE customer_id = % s', (customer_id,))
+    user = cur.fetchone()
+    return user
+
+def get_review(mysql,product_id, parent_id):
+    if parent_id == 0:
+        cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cur.execute('SELECT * FROM Reviews WHERE product_id = %s and parent_id IS NULL', (product_id, ))
+        review = cur.fetchall()
+        return review
+    elif parent_id == 1:
+        cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cur.execute('SELECT * FROM Reviews WHERE product_id = %s and parent_id IS NOT NULL', (product_id, ))
+        review = cur.fetchall()
+        return review
+    else:
+        cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cur.execute('SELECT * FROM Reviews WHERE product_id = %s and parent_id =%s ', (product_id, parent_id))
+        review = cur.fetchall()
+        return review
+
 
 def get_shoppingCart(mysql,customer_id,session_id):
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
@@ -88,10 +126,10 @@ def insert_orderProduct(mysql,customer_id, order_id, product_id, product_name, p
         ,(customer_id,order_id, product_id, product_name, product_price, amount, total_price,))
     mysql.connection.commit()
 
-def insert_review(mysql, product_id, customer_id, parent_id, publishedAt, purchase_date, rating, review):
+def insert_review(mysql, product_id, customer_id, parent_id, publishedAt, purchase_date, rating, review, name):
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    cur.execute("INSERT INTO Reviews (product_id, customer_id, parent_id, publishedAt, purchase_date, rating, review) VALUES (%s,%s,%s,%s,%s,%s,%s)"
-        ,(product_id,customer_id, parent_id, publishedAt, purchase_date, rating, review,))
+    cur.execute("INSERT INTO Reviews (product_id, customer_id, parent_id, publishedAt, purchase_date, rating, review, name) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)"
+        ,(product_id,customer_id, parent_id, publishedAt, purchase_date, rating, review,name,))
     mysql.connection.commit()
 
 
@@ -119,7 +157,10 @@ def update_shoppingCart(mysql, customer_id, session_id):
     cur.execute('UPDATE Cart SET session_id = NULL, customer_id = %s WHERE session_id = %s', (customer_id, session_id,))
     mysql.connection.commit()
 
-
+def update_productAvrageRating(mysql, product_id):
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute('UPDATE Products SET avrage_rating = (SELECT AVG(rating) FROM Reviews where product_id = %s) WHERE product_id = %s', (product_id, product_id,))
+    mysql.connection.commit()
 
 def delete_shoppingCartItem(mysql, customer_id, session_id, product_id):
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
@@ -136,6 +177,8 @@ def delete_shoppingCart(mysql, customer_id, session_id):
     else:
         cur.execute ('DELETE FROM Cart WHERE customer_id = %s', (customer_id,))
     mysql.connection.commit()
+
+
 
 def check_email(mysql,email):
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
