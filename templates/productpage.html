@@ -43,7 +43,7 @@
           </div>
         </div>
       </div>
-      <div class="col-md-4">
+      <div class="col-md-8">
         <h2 class="text-center mt-3">Reviews</h2>
         <div class="card border-primary rounded">
           <ul class="list-group list-group-flush">
@@ -58,7 +58,7 @@
                 <ul class="list-group list-group-flush mt-2">
                   {% for answer in answers if answer['parent_id'] == review['review_id'] %}
                     <li class="list-group-item pl-3 border-top">
-                      <p class="mb-0">Reply from {{ answer['name'] }}: {{ answer['review'] }}</p>
+                      <p class="mb-0">Reply from {{ answer['name'] }} at {{ answer['publishedAt'] }}: {{ answer['review'] }}</p>
                     </li>
                     
                     {% endfor %}
