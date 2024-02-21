@@ -341,7 +341,6 @@ def addAnswer():
             db.insert_review(mysql, productId, customer_id, parent_id, publishedAt, purchase_date, rating, review,name)
         elif session['isAdmin']:
             customer_id = None
-            parent_id = None
             publishedAt = datetime.now()
             purchase_date = None
             rating = None
