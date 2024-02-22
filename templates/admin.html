@@ -53,6 +53,57 @@
 </div>
 
 
+<!-- Confirming order -->
+<form action="/show-orders">
+  <button id='toggle' class='btn btn-warning'>
+    Show
+  </button>
+</form>
+
+<div class="orders" id="orders-table">
+  <div class="table-responsive">
+    <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">order_product_id</th>
+            <th scope="col">customer_id</th>
+            <th scope="col">order_id</th>
+            <th scope="col">product_id</th>
+            <th scope="col">product_name</th>
+            <th scope="col">product_price</th>
+            <th scope="col">amount</th>
+            <th scope="col">total_price</th>
+          </tr>
+        </thead>
+        {% for order in orders %}
+
+        <tr>
+          <form action="confirm-a-order">
+          <input type="hidden" name="product_id" value="{{order['product_id']}}">
+            <td>{{order['order_product_id']}}</td>
+            <td>{{order['customer_id']}}</td>
+            <td>{{order['order_id']}}</td>
+            <td>{{order['product_id']}}</td>
+            <td>{{order['product_name']}}</td>
+            <td>{{order['product_price']}}</td>
+            <td>{{order['amount']}}</td>
+            <td>{{order['total_price']}}</td>
+            <td> <button id='submit' class='btn btn-success'> 
+              Confirm order 
+            </button></td>
+          </form>
+          </tr>
+
+        {% endfor %}
+      </table>
+      <form action="/confirm-orders">
+        <button id='toggle' class='btn btn-success'>
+          Confirm all orders
+        </button>
+      </form>
+  </div>
+</div>
+
     
 <div class="users" id="userstable">
   <div class="table-responsive">

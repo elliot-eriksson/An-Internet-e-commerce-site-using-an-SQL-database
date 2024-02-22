@@ -71,18 +71,12 @@
 
   <div class="container">
     <header>
-    <div class="title">Product List</div>
-    <div class="icon-cart">
-      <svg onclick="" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 4h1.5L9 16m0 0h8m-8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm-8.5-3h9.3L19 7H7.3"/>
-      </svg>
-      <span id="NumOfItems">0</span>
-    </div>
+    <div class="title"><h1>Product List</h1></div>
   </header>
     <div class="row">
       {% for product in productTest %}
       
-      <div class="col-md-3 mt-3">
+      <div id="productDisplay" class=" col-md-3 mt-3">
         <div class="card">
           <img src="{{ url_for('static', filename=product['image_address1']) }}" alt="{{product['product_name']}}">
 
@@ -103,7 +97,7 @@
                 <form action="/add-to-cart" method="post">
                   <input type="hidden" name="product_id" value="{{ product['product_id'] }}">
                   <input type="text" class="product_quantity" name="quantity" value="1" size="2">
-                  <input onclick="cartSession()" type="submit" value="Add to cart" class="btn btn-warning">
+                  <input type="submit" value="Add to cart" class="btn btn-warning">
                 </form>
               </div>
             </div>

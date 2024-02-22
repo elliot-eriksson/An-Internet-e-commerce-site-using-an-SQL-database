@@ -34,7 +34,26 @@ def get_product_in_cart(mysql, product_id):
     product = cur.fetchone()
     return product
 
-def get_product_from_order(mysql, order_id):
+def get_all_product_from_order(mysql):
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute('SELECT * FROM OrderProducts WHERE conf IS NULL')
+    products = cur.fetchall()
+    return products
+
+def get_a_product_from_order(mysql,product_id):
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute('SELECT * FROM OrderProducts WHERE product_id = %s', (product_id,))
+    products = cur.fetchone()
+    return products
+
+def get_product_available_amount(mysql,product_id):
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute('SELECT product_available_amount FROM Products WHERE product_id = % s', (product_id,))
+    product = cur.fetchone()
+    return product
+
+
+def get_confirm_orderProducts(mysql, order_id):
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cur.execute('SELECT * FROM OrderProducts WHERE order_id = % s', (order_id,))
     products = cur.fetchall()
@@ -142,6 +161,22 @@ def update_product(mysql, product_id, product_name, price, stock, last_restock_d
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cur.execute("UPDATE Products SET product_name = %s, product_price = %s, product_available_amount = %s, product_total_amount = %s, last_restock_date = %s WHERE product_id = %s "
         ,(product_name, price, stock, totalStock, last_restock_date, product_id,))
+    mysql.connection.commit()
+
+def update_products_from_order(mysql):
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute('UPDATE OrderProducts SET conf = true WHERE conf IS NULL')
+    mysql.connection.commit()
+
+def update_available_amount(mysql,product_available_amount, product_id):
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute('UPDATE Products SET product_available_amount = %s WHERE product_id = %s '
+        ,( product_available_amount, product_id,))
+    mysql.connection.commit()
+
+def update_a_product_from_order(mysql, product_id):
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute('UPDATE OrderProducts SET conf = true WHERE product_id = %s', (product_id,))
     mysql.connection.commit()
 
 def update_shoppingCartItem(mysql, customer_id, session_id, product_id, quantity, updatedAt):

@@ -208,7 +208,37 @@ def editProduct():
                 db.update_product(mysql, product_id, product_name, price, stock, last_restock_date, totalStock)
                 var = "changed"
             return render_template('admin.html', var=var)
+
+@app.route('/show-orders')
+def showOrders():
+    orders = db.get_all_product_from_order(mysql)
+    return render_template('admin.html', orders=orders)
+
+@app.route('/confirm-a-order')
+def confirmAOrder():
+    productId = request.args['product_id']
+    order = db.get_a_product_from_order(mysql, productId)
+    amountPurchased = order['amount']
+    amountBefore = db.get_product_available_amount(mysql, productId)
+    quantity = amountBefore['product_available_amount'] - amountPurchased 
+    db.update_available_amount(mysql, quantity, productId )
+
+    db.update_a_product_from_order(mysql, productId)
+    return render_template('admin.html')
     
+@app.route('/confirm-orders')
+def confirmOrder():
+    orders = db.get_all_product_from_order(mysql)
+    
+    for order in orders:
+        productId = order['product_id']
+        amountPurchased = order['amount']
+        amountBefore = db.get_product_available_amount(mysql, productId)
+        quantity = amountBefore['product_available_amount'] - amountPurchased 
+        db.update_available_amount(mysql, quantity, productId )
+
+    db.update_products_from_order(mysql)
+    return render_template('admin.html')
     
 @app.route('/checkout')
 def checkOut():

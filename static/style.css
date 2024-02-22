@@ -1,13 +1,30 @@
 body{
   margin: 0;
+  background-color: rgb(244, 244, 243);
 }
 
 .container{
-  width: 900px;
+  width: 60%;
   max-width: 90vw; 
   margin: auto; 
   text-align: center;
 
+
+}
+.row{
+  margin: auto;
+  padding-bottom: 18px;
+}
+.card{
+  width: 14vw;
+}
+.card img{
+  width: 150px;
+  align-items: center;
+
+}
+.card-footer{
+  background-color: white;
 }
 svg{
   width: 30px;
@@ -20,23 +37,7 @@ header{
 
 
 }
-header .icon-cart{
-  position: relative;
-}
-header .icon-cart span{
-  display: flex;
-  width: 30px;
-  height: 30px;
-  background-color: red;
-  justify-content: center;
-  align-items: center;
-  color: #fff;
-  border-radius: 50%;
-  position: absolute;
-  top: 50%;
-  right: -20px;
-}
-/*----------------------CART ------------- */
+
 
 #reviewShow {
   display: none;
