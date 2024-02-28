@@ -1,4 +1,4 @@
-body{
+/* body{
   margin: 0;
   background-color: rgb(244, 244, 243);
 }
@@ -18,11 +18,11 @@ body{
 .card{
   width: 14vw;
 }
-.card img{
-  width: 150px;
-  align-items: center;
 
+.card img {
+  height: 10vw;
 }
+
 .card-footer{
   background-color: white;
 }
@@ -34,8 +34,60 @@ header{
   align-items: center;
   justify-content: space-between;
   padding: 20px 0;
+} */
 
+/* CSS for Product Display */
 
+#productDisplay {
+  padding: 10px;
+
+}
+
+.card {
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  transition: box-shadow 0.3s;
+  width: 200px;
+  
+  
+}
+
+.card:hover {
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+}
+
+.card img {
+  display: inline-block;
+  border-radius: 5px;
+  width:70% !important;
+  height:90% !important;
+  max-width: 200px !important;
+  max-height: 200px!important;
+  align-self: center;
+}
+
+.card-body {
+  
+}
+
+.card-footer {
+  padding: 15px;
+  /* background-color: #f9f9f9; */
+}
+
+.View-product,
+.Add-to-cart {
+  margin-top: 10px;
+}
+
+.product_quantity {
+  width: 50px;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  /* justify-content: space-between; Distribute items evenly along the main axis */
 }
 
 

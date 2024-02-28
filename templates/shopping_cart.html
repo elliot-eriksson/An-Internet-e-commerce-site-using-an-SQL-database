@@ -24,12 +24,14 @@
               </thead>
               {% for product in cartItems %}
               <tr>
-                      <input type="hidden" name="product_id" value="{{product['product_id']}}">
-                      <td>{{product['product_name']}}</td>
-                      <td>{{product['price']}}</td>
-                      <td>{{product['quantity']}}</td>
-                      <td>{{product['TotalPrice']}}</td>
-                  </form>
+                <td>{{product['product_name']}}</td>
+                <td>{{product['price']}}</td>
+                <td>{{product['quantity']}}</td>
+                <td>{{product['TotalPrice']}}</td>
+                <form action="/remove-item-from-cart" method="post">
+                    <input type="hidden" name="product_id" value="{{product['product_id']}}">
+                    <td><button id='submit' class='btn btn-danger'>Remove item </td>
+                </form>
               </tr>
               {% endfor %}
           </table>

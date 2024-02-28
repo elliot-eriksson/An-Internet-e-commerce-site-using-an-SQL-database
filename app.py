@@ -33,8 +33,26 @@ def index():
             1==1
     except:
         session['id'] = random.randrange(10000000,99999999)
+
+    try:
+        if session['loggedin']:
+            customerId = session['id']
+            sessionId = None
+    except:
+        customerId = None
+        sessionId = session['id']
+
     productTest = db.select_products(mysql)
-    return render_template('index.html', productTest=productTest)
+    cartItems = db.get_shoppingCart(mysql, customerId, sessionId)
+    totalPrice = 0
+    for item in cartItems:
+        products = db.get_product(mysql,item['product_id'])
+        item['price'] = products['product_price']
+        item['product_name'] = products['product_name']
+        item['TotalPrice'] = int(item['price']) * int(item['quantity'])
+        totalPrice = totalPrice + item['TotalPrice']
+    print(cartItems)
+    return render_template('index.html', productTest=productTest, cartItems = cartItems)
 
 @app.route('/login')
 # @app.route('/login.html')
@@ -396,6 +414,48 @@ def addAnswer():
         except:    
             var = "Needs to have acount to add review"
             return redirect('/login', var=var)
+
+@app.route('/remove-item-from-cart', methods=['POST'])       
+def removeProductInCart():
+    print("Enter")
+    try:
+        if session['loggedin']:
+            customerId = session['id']
+            sessionId = None
+    except:
+        customerId = None
+        sessionId = session['id']
+    print("customerId", customerId)
+    print("sessionId", sessionId)
+
+
+    productId = request.form['product_id']
+    print("product_id", productId)
+    db.delete_shoppingCartItem(mysql,customerId,sessionId, productId)
+    totalPrice = 0
+    cartItems = db.get_shoppingCart(mysql, customerId, sessionId)
+    for item in cartItems:
+        products = db.get_product(mysql,item['product_id'])
+        item['price'] = products['product_price']
+        item['product_name'] = products['product_name']
+        item['TotalPrice'] = int(item['price']) * int(item['quantity'])
+        totalPrice = totalPrice + item['TotalPrice']
+       
+    return redirect('/index.html')
+
+@app.route('/clear-cart', methods=['POST'])       
+def clearCart():
+    productId = request.form['product_id']
+    try:
+        if session['loggedin']:
+            customerId = session['id']
+            sessionId = None
+    except:
+        customerId = None
+        sessionId = session['id']
+    db.delete_shoppingCart(mysql, customerId, sessionId)
+    return redirect("/index.html")
+
 
 if __name__ == "__main__":
     app.run(port=5002, debug=True)

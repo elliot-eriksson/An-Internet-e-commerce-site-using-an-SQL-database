@@ -205,6 +205,7 @@ def delete_shoppingCartItem(mysql, customer_id, session_id, product_id):
         cur.execute ('DELETE FROM Cart WHERE customer_id = %s and product_id = %s', (customer_id, product_id,))
     mysql.connection.commit()
 
+
 def delete_shoppingCart(mysql, customer_id, session_id):
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     if customer_id is None:
