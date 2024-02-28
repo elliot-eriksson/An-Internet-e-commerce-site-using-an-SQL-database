@@ -1,103 +1,33 @@
-/* body{
-  margin: 0;
-  background-color: rgb(244, 244, 243);
-}
-
 .container{
-  width: 60%;
-  max-width: 90vw; 
-  margin: auto; 
-  text-align: center;
-
-
-}
-.row{
-  margin: auto;
-  padding-bottom: 18px;
+    margin-left: auto;
+    margin-right: auto;
 }
 .card{
-  width: 14vw;
+    background-color: azure;
+    justify-content: center;
 }
-
-.card img {
-  height: 10vw;
+.card-body{
+    display: inline-block;
+    justify-self: flex-end;
 }
-
-.card-footer{
-  background-color: white;
+#product-images img{
+    display:-moz-inline-grid;
 }
-svg{
-  width: 30px;
-}
-header{
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 20px 0;
-} */
-
-/* CSS for Product Display */
-
-#productDisplay {
-  padding: 10px;
+.col-md-6{
+    justify-items:flex-end;
 
 }
-
-.card {
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  transition: box-shadow 0.3s;
-  width: 200px;
-  
-  
-}
-
-.card:hover {
-  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
-}
-
-.card img {
-  display: inline-block;
-  border-radius: 5px;
-  width:70% !important;
-  height:90% !important;
-  max-width: 200px !important;
-  max-height: 200px!important;
-  align-self: center;
-}
-
-.card-body {
-  
-}
-
-.card-footer {
-  padding: 15px;
-  /* background-color: #f9f9f9; */
-}
-
-.View-product,
-.Add-to-cart {
-  margin-top: 10px;
-}
-
-.product_quantity {
-  width: 50px;
-}
-
-.row {
-  display: flex;
-  flex-wrap: wrap;
-  /* justify-content: space-between; Distribute items evenly along the main axis */
-}
-
 
 #reviewShow {
-  display: none;
-}
-#answerShow {
-  display: none;
-}
-
-svg :hover {
-  cursor: pointer;
-}
+    display: none;
+  }
+  #answerShow {
+    display: none;
+  }
+  svg{
+    width: 30px;
+  }
+  svg :hover {
+    cursor: pointer;
+  }
+form.hide-submit input[type="submit"] { display: none;}

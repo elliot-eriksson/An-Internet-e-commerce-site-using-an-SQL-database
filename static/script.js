@@ -8,3 +8,9 @@ function showElement(element){
   }
   
 }
+
+function logout(){
+  
+}
+
+document.getElementById("logout").onload = function() {logout()};

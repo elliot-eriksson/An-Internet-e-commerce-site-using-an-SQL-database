@@ -12,7 +12,7 @@
 <body>
 <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
   <div class="container-fluid">
-    <a class="navbar-brand" href="javascript:void(0)">Logo</a>
+    <a class="navbar-brand" href="index.html">Home</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mynavbar">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -73,6 +73,12 @@
             <th scope="col">product_price</th>
             <th scope="col">amount</th>
             <th scope="col">total_price</th>
+            <th>
+            <form action="/confirm-orders">
+              <button id='toggle' class='btn btn-success'>
+                Confirm all orders
+              </button>
+            </th>
           </tr>
         </thead>
         {% for order in orders %}
@@ -96,10 +102,7 @@
 
         {% endfor %}
       </table>
-      <form action="/confirm-orders">
-        <button id='toggle' class='btn btn-success'>
-          Confirm all orders
-        </button>
+      
       </form>
   </div>
 </div>

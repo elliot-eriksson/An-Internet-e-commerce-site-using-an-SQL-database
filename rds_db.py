@@ -131,7 +131,9 @@ def insert_order(mysql, customer_id, date_of_purchase):
     cur.execute("INSERT INTO Orders (customer_id, date_of_purchase, total_price) VALUES (%s,%s,%s)"
         ,(customer_id, date_of_purchase, 0,))
     mysql.connection.commit()
-    return cur.execute('select last_insert_id() from Orders')
+    cur.execute('select max(order_id) as OrderID from Orders where customer_id = %s ', (customer_id,))
+    item = cur.fetchone()
+    return item
 
 def insert_shoppingCart(mysql, customer_id, session_id, product_id, product_amount, updatedAt):
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)

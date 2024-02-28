@@ -57,7 +57,13 @@ def index():
 @app.route('/login')
 # @app.route('/login.html')
 def loginPage():
-    return render_template('login.html')
+    try:
+        if session["loggedin"]:
+            var = "already logged in"
+            return render_template("login.html",var = var)
+    except:
+        return render_template('login.html')
+    
 @app.route('/l')
 def reginPage():
     return render_template('create_user.html')
@@ -82,8 +88,7 @@ def insert_new_user():
     if request.method == 'POST':
         email = request.form['email']
         if db.check_email(mysql, email):
-            var = "Email in use"
-            return render_template('index.html', var=var)
+            return redirect('/')
         first_name = request.form['first_name']
         last_name = request.form['last_name']
         password = enc.encrypPassword(request.form['password'])
@@ -95,8 +100,7 @@ def insert_new_user():
         session['loggedin'] = True
         session['id'] = account['customer_id']
         session['username'] = account['email']
-        var = "User created"
-        return render_template('index.html', var=var)
+        return redirect('/')
 #TODO Implement what will happen when you loggin 
 # Store the customer_id  
 @app.route('/login',methods = ['post'])
@@ -113,24 +117,26 @@ def login_user():
             session['loggedin'] = True
             session['isAdmin'] = True
             return render_template('admin.html', var=var)
+        try:    
+            if db.check_credentails(mysql,email, password):
+                account = db.get_user(mysql,email)
 
-        if db.check_credentails(mysql,email, password):
-            account = db.get_user(mysql,email)
+                # cursor = conn.cursor()
+                # cursor.execute('SELECT * FROM accounts WHERE email = % s', (email))
+                if account:
+                    # print("account", account)
+                    session['loggedin'] = True
+                    session['id'] = account['customer_id']
+                    session['username'] = account['email']
+                    # print("acount", account['customer_id'])
+                
+                var = session['id']
 
-            # cursor = conn.cursor()
-            # cursor.execute('SELECT * FROM accounts WHERE email = % s', (email))
-            if account:
-                # print("account", account)
-                session['loggedin'] = True
-                session['id'] = account['customer_id']
-                session['username'] = account['email']
-                # print("acount", account['customer_id'])
+                return redirect('/')
+        except:
+            return redirect("/")
             
-            var = session['id']
-
-            return redirect('/')
-    var = "Account error"
-    return render_template('index.html', var=var)
+    return redirect('/')
 
 @app.route('/logout')
 def logout():
@@ -267,7 +273,8 @@ def checkOut():
     except:
         return redirect('/l')
     
-    orderID = db.insert_order(mysql, customerId, datetime.now())
+    order = db.insert_order(mysql, customerId, datetime.now())
+    orderID = order['OrderID']
     cart = db.get_shoppingCart(mysql, customerId, sessionID)
     totalPrice = 0
 #-------------- Insert product updated info ------------------------- #
@@ -277,10 +284,17 @@ def checkOut():
         item['product_name'] = products['product_name']
         item['TotalPrice'] = int(item['price']) * int(item['quantity'])
         totalPrice = totalPrice + item['TotalPrice']
+
+        print("CustomerID", customerId)
+        print("ORDER ID", orderID)
+        print("ORDER ID", item['product_id'])
+        
         db.insert_orderProduct(mysql, customerId, orderID, item['product_id'], item['product_name'], item['price'], item['quantity'], item['TotalPrice'])
     db.update_order(mysql, orderID, totalPrice)
 
-    checkOut = db.get_product_from_order(mysql, orderID)
+    checkOut = db.get_confirm_orderProducts(mysql, orderID)
+    
+    db.delete_shoppingCart(mysql, customerId, sessionID)
     
     return render_template('order_conf.html',checkOut=checkOut,order_product_id = orderID)
 
@@ -365,8 +379,8 @@ def addReview():
             db.insert_review(mysql, productId, customer_id, parent_id, publishedAt, purchase_date, rating, review, name)
             db.update_productAvrageRating(mysql,productId)
         else:
-            var = "Needs to have purchase product to add review"
-            return redirect('/login', var=var) 
+            var = "<h1>Needs to have purchase product to add review</h1>"
+            return var 
         product = db.get_product(mysql, productId)
         topreview = db.get_review(mysql, productId, 0)
         answers = db.get_review(mysql, productId, 1)
@@ -374,7 +388,7 @@ def addReview():
         return render_template('productpage.html', product = product, topreview = topreview, answers = answers)
     except: 
         var = "Needs to have acount to add review"
-        return redirect('/login', var=var)
+        return "<h1>Needs to have purchase product to add review</h1>"
     
 
 @app.route('/reviewAns', methods=['POST'])
@@ -445,7 +459,6 @@ def removeProductInCart():
 
 @app.route('/clear-cart', methods=['POST'])       
 def clearCart():
-    productId = request.form['product_id']
     try:
         if session['loggedin']:
             customerId = session['id']
