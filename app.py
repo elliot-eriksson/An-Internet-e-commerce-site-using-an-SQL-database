@@ -270,8 +270,6 @@ def checkOut():
 def addToShoppingCart():
     productId = request.form['product_id']
     amount = request.form['quantity']
-    print("hej")
-
     try:
         if session['loggedin']:
             customerId = session['id']
@@ -279,6 +277,11 @@ def addToShoppingCart():
     except:
         customerId = None
         sessionID = session['id']
+    product = db.get_product(mysql, productId)
+    if product["product_available_amount"] < int(amount):
+        var = "To many"+ productId["product_name"] +"chosen max available: " + productId["product_available_amount"]
+        productTest = db.select_products(mysql)
+        return render_template('index.html', productTest=productTest, var=var)
     print("Customer ID     " ,customerId)
     print("Session ID      " ,sessionID)
     print("product ID", productId)
@@ -343,13 +346,17 @@ def addReview():
             
             db.insert_review(mysql, productId, customer_id, parent_id, publishedAt, purchase_date, rating, review, name)
             db.update_productAvrageRating(mysql,productId)
+        else:
+            var = "Needs to have purchase product to add review"
+            return redirect('/login', var=var) 
         product = db.get_product(mysql, productId)
         topreview = db.get_review(mysql, productId, 0)
         answers = db.get_review(mysql, productId, 1)
 
         return render_template('productpage.html', product = product, topreview = topreview, answers = answers)
-    except:
-        return redirect('/login')
+    except: 
+        var = "Needs to have acount to add review"
+        return redirect('/login', var=var)
     
 
 @app.route('/reviewAns', methods=['POST'])
@@ -382,7 +389,13 @@ def addAnswer():
         answers = db.get_review(mysql, productId, 1)
         return render_template('productpage.html', product = product, topreview = topreview, answers = answers)
     except:
-        return redirect('/login')
+        try: 
+            if session['loggedin']:
+                var = "Needs to have purchase product to add review"
+                return redirect('/login', var=var) 
+        except:    
+            var = "Needs to have acount to add review"
+            return redirect('/login', var=var)
 
 if __name__ == "__main__":
     app.run(port=5002, debug=True)
