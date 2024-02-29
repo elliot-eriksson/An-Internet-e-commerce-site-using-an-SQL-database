@@ -24,7 +24,7 @@
         <div class="card mb-4">
           <div class="row g-0">
             <div id="product-images" class="col-md-6">
-              <img src="{{ url_for('static', filename=product['image_address1']) }}" alt="{{product['product_name']}}" class="img-fluid" style="width: 100%; height: 300px; object-fit: cover;">
+              <img src="{{ url_for('static', filename=product['image_address1']) }}" alt="{{product['product_name']}}" class="img-fluid" style="width: 70%; height: 300px; object-fit: cover;">
               <img src="{{ url_for('static', filename=product['image_address2']) }}" alt="{{product['product_name']}}" class="img-fluid" style="width: 100%; height: 300px; object-fit: cover;">
               <img src="{{ url_for('static', filename=product['image_address3']) }}" alt="{{product['product_name']}}" class="img-fluid" style="width: 100%; height: 300px; object-fit: cover;">
             </div>
@@ -41,7 +41,7 @@
                     <i class="bi bi-star-fill text-warning"></i>
                     <i class="bi bi-star-half text-warning"></i>
                   </span>
-                  <p class="mb-0 text-muted">4.5 out of 5 stars</p>
+                  <p class="mb-0 text-muted">{{product['avrage_rating']}}</p>
                 </div>
                 <p class="card-text mt-3">{{product['short_description']}}</p>
                 <div class="Add-to-cart">
@@ -51,7 +51,8 @@
                     <input type="submit" value="Add to cart" class="btn btn-warning">
                   </form>
                 </div>
-                <button onclick="showElement('reviewShow')" class='btn btn-primary mt-3'> Add Review </button>    
+                <button onclick="showElement('reviewShow')" class='btn btn-primary mt-3'> Add Review </button> 
+                <button onclick="showElement('ratingShow')" class='btn btn-primary mt-3'> Update Rating </button>     
               </div>
             </div>
           </div>
@@ -65,7 +66,10 @@
               <li class="list-group-item">
                 <div class="d-flex justify-content-between align-items-center">
                   <h5>{{ review['name'] }}</h5>
-                  <span class="badge bg-secondary rounded-pill">Rating: {{ review['rating'] }}</span>
+                  <!-- <span class="badge bg-secondary rounded-pill">Rating: {{ review['rating'] }}</span> -->
+                  {% for rating in ratings if rating['product_id'] == review['product_id'] and rating['customer_id'] == review['customer_id']  %}
+                    <span class="badge bg-secondary rounded-pill">Rating: {{ rating['rating'] }}</span>
+                  {% endfor %}
                 </div>
                 <p class="mb-0">Published at: {{ review['publishedAt'] }}</p>
                 <p>{{ review['review'] }}</p>
@@ -107,11 +111,15 @@
   <div id="reviewShow" class="col-sm-4 " >
     <form action="/review" method="post">
     <input type="hidden" name="product_id" value="{{ product['product_id'] }}">
-      <div class="mb-3 mt-3">
-        <label for="rating" class="form-label">Rating:</label>
-        <input type="value" class="form-control" id="rating" placeholder="Enter rating" name="rating">
-      </div>
       <div class="mb-3">
+        <select class="form-select" name="starRating">
+            <option value="">Select a rating</option>
+            <option value="5">Excellent</option>
+            <option value="4">Very Good</option>
+            <option value="3">Average</option>
+            <option value="2">Poor</option>
+            <option value="1">Terrible</option>
+        </select>
         <label for="review" class="form-label">Review:</label>
         <input type="text" class="form-control" id="review" placeholder="Enter review" name="review">
       </div>
@@ -119,8 +127,18 @@
     </form>
   </div>
 
-
+  <div id="ratingShow" class="col-sm-4 " >
+    <form action="/rating" method="post">
+    <input type="hidden" name="product_id" value="{{ product['product_id'] }}">
+      <div class="mb-3 mt-3">
+        <label for="rating" class="form-label">Rating:</label>
+        <input type="value" class="form-control" id="rating" placeholder="Enter rating" name="rating">
+      </div>
+      <button type="submit" class="btn btn-primary">Submit rating</button>
+    </form>
+  </div>
 
   <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
+

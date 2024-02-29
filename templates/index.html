@@ -10,63 +10,18 @@
 
 </head>
 
-<nav class="navbar navbar-expand-sm navbar-dark bg-dark">
-  <div class="container-fluid">
-    <a class="navbar-brand" href="javascript:void(0)">Logo</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mynavbar">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="mynavbar">
-      <ul class="navbar-nav me-auto">
-        <li class="nav-item">
-          <a class="nav-link" href="javascript:void(0)">Link</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="javascript:void(0)">Link</a>
-        </li>
-        <li class="nav-item">
-          <form action="/login">
-            <a class="nav-link" href="login">Login</a>
-          </form>
-        </li>
 
-      </ul>
-      <!-- <form class="d-flex">
-        <form action="/shoppingcart">
-          <button onclick = "setCartCookie()" type="submit" name="users" class="btn btn-danger">Shopping cart</button>
-        </form>        
-      </form> -->
 
-    </div>
+<div id="nav-placeholder">
+  {% include 'nav.html' %}
+  <div class="container-fluid p-5  text-white text-center" style="background-color: rgb(15, 25, 103);">
+    <h1>GearUp</h1>
+    <p>Gear up before the tenta hits you!</p>
   </div>
-</nav>
+
+</div>
 
 <body>
-  <div class="container-fluid p-5 bg-success text-white text-center">
-    <h1>Website Name</h1>
-    <p>slogan</p>
-  </div>
-
-<!-- #--------------------->
-<!-- <div id="login" class="col-sm-4">
-  <form action="/login" method="post">
-    <div class="mb-3 mt-3">
-      <label for="email" class="form-label">Email:</label>
-      <input type="email" class="form-control" id="email" placeholder="Enter email" name="email">
-    </div>
-    <div class="mb-3">
-      <label for="pwd" class="form-label">Password:</label>
-      <input type="password" class="form-control" id="pwd" placeholder="Enter password" name="pwd">
-    </div>
-    <div class="form-check mb-3">
-      <label class="form-check-label">
-        <input class="form-check-input" type="checkbox" name="remember"> Remember me
-      </label>
-    </div>
-    <button type="submit" class="btn btn-primary">Submit</button>
-  </form>
-</div> -->
-
 
 
   <div class="container">
@@ -116,6 +71,7 @@
 
           <thead>
               <tr>
+              <th scope="col"></th>
               <th scope="col">Product name</th>
               <th scope="col">Unit price</th>
               <th scope="col">Amount</th>
@@ -130,6 +86,9 @@
           </thead>
           {% for product in cartItems %}
           <tr>
+            {% for pic in productTest if pic["product_id"] == product["product_id"]%}
+            <td><img src="{{ url_for('static', filename=pic['image_address1']) }}" alt="{{pic['product_name']}}"></td>
+            {% endfor %}
             <td>{{product['product_name']}}</td>
             <td>{{product['price']}}</td>
             <td>{{product['quantity']}}</td>
@@ -140,12 +99,18 @@
             </form>
           </tr>
           {% endfor %}
+          <div class="total-price">
+            <p>Total Price: {{totalUnitPrice }} </p>
+        </div>
       </table>
+      <div class="checkout-button">
+      <form action="/checkout">
+        <button  type="submit" name="users" class="btn btn-danger ">Check out</button>
+      </form>
+      </div>
     </div>
   </div>
-  <form action="/checkout">
-    <button id="hej" type="submit" name="users" class="btn btn-danger ">check out</button>
-  </form>
+  
 
   <!-- <div class="cartTab">
 
@@ -168,10 +133,12 @@
   </form>
   </div>
 
+  {{ var }}
 
 <div class="mt-5 p-4 bg-dark text-white text-center">
   <p>Footer</p>
 </div>
+
 <script src="{{ url_for('static', filename='script.js') }}"></script>
 
 </body>

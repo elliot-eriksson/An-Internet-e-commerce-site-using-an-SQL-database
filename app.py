@@ -238,16 +238,21 @@ def showOrders():
     orders = db.get_all_product_from_order(mysql)
     return render_template('admin.html', orders=orders)
 
-@app.route('/confirm-a-order')
+@app.route('/confirm-a-order', methods=['POST','GET'])
 def confirmAOrder():
-    productId = request.args['product_id']
-    order = db.get_a_product_from_order(mysql, productId)
+    # orderProductId = request.form.get('orderproductid')
+    orderProductId = request.args['orderproductid']
+    print("---------------------------",orderProductId)
+    order = db.get_a_product_from_order(mysql, orderProductId)
     amountPurchased = order['amount']
-    amountBefore = db.get_product_available_amount(mysql, productId)
+    amountBefore = db.get_product_available_amount(mysql, order["product_id"] )
+    if amountPurchased > amountBefore['product_available_amount']:
+        var = "Not enough of " + order["product_name"] + " in stock"  
+        return render_template('admin.html', var=var)
     quantity = amountBefore['product_available_amount'] - amountPurchased 
-    db.update_available_amount(mysql, quantity, productId )
+    db.update_available_amount(mysql, quantity, order["product_id"] )
 
-    db.update_a_product_from_order(mysql, productId)
+    db.update_a_product_from_order(mysql, orderProductId)
     return render_template('admin.html')
     
 @app.route('/confirm-orders')
@@ -258,10 +263,13 @@ def confirmOrder():
         productId = order['product_id']
         amountPurchased = order['amount']
         amountBefore = db.get_product_available_amount(mysql, productId)
+        if amountPurchased > amountBefore['product_available_amount']:
+            var = "Not enough of " + order["product_name"] + " in stock manually confirm orders"  
+            return render_template('admin.html', var=var)
         quantity = amountBefore['product_available_amount'] - amountPurchased 
         db.update_available_amount(mysql, quantity, productId )
+        db.update_a_product_from_order(mysql, order["order_product_id"])
 
-    db.update_products_from_order(mysql)
     return render_template('admin.html')
     
 @app.route('/checkout')
@@ -276,27 +284,26 @@ def checkOut():
     order = db.insert_order(mysql, customerId, datetime.now())
     orderID = order['OrderID']
     cart = db.get_shoppingCart(mysql, customerId, sessionID)
-    totalPrice = 0
+    totalUnitPrice = 0
 #-------------- Insert product updated info ------------------------- #
     for item in cart:
         products = db.get_product(mysql,item['product_id'])
         item['price'] = products['product_price']
         item['product_name'] = products['product_name']
-        item['TotalPrice'] = int(item['price']) * int(item['quantity'])
-        totalPrice = totalPrice + item['TotalPrice']
-
+        item['totalUnitPrice'] = int(item['price']) * int(item['quantity'])
+        totalUnitPrice = totalUnitPrice + item['totalUnitPrice']
         print("CustomerID", customerId)
         print("ORDER ID", orderID)
         print("ORDER ID", item['product_id'])
         
-        db.insert_orderProduct(mysql, customerId, orderID, item['product_id'], item['product_name'], item['price'], item['quantity'], item['TotalPrice'])
-    db.update_order(mysql, orderID, totalPrice)
+        db.insert_orderProduct(mysql, customerId, orderID, item['product_id'], item['product_name'], item['price'], item['quantity'], item['totalUnitPrice'])
+    db.update_order(mysql, orderID, totalUnitPrice)
 
     checkOut = db.get_confirm_orderProducts(mysql, orderID)
     
     db.delete_shoppingCart(mysql, customerId, sessionID)
     
-    return render_template('order_conf.html',checkOut=checkOut,order_product_id = orderID)
+    return render_template('order_conf.html',checkOut=checkOut,order_product_id = orderID, totalUnitPrice = totalUnitPrice)
 
 @app.route('/add-to-cart', methods=['POST'])
 def addToShoppingCart():
@@ -310,22 +317,39 @@ def addToShoppingCart():
         customerId = None
         sessionID = session['id']
     product = db.get_product(mysql, productId)
-    if product["product_available_amount"] < int(amount):
-        var = "To many"+ productId["product_name"] +"chosen max available: " + productId["product_available_amount"]
-        productTest = db.select_products(mysql)
-        return render_template('index.html', productTest=productTest, var=var)
-    print("Customer ID     " ,customerId)
-    print("Session ID      " ,sessionID)
-    print("product ID", productId)
+
+    
     productInCart = db.get_shoppingCartItem(mysql, customerId, sessionID, productId)
     print(productInCart)
     if productInCart:
         print("har produkt")
         quantity = productInCart ['quantity'] + int(amount)
+        if product["product_available_amount"] < int(quantity):
+            var = "To many"+ product["product_name"] +" chosen max available: " + str(product["product_available_amount"])
+            productTest = db.select_products(mysql)
+            cartItems = db.get_shoppingCart(mysql, customerId, session['id'])
+            for item in cartItems:
+                products = db.get_product(mysql,item['product_id'])
+                item['price'] = products['product_price']
+                item['product_name'] = products['product_name']
+                item['TotalPrice'] = int(item['price']) * int(item['quantity'])
+                totalPrice = totalPrice + item['TotalPrice']
+            return render_template('index.html', productTest=productTest, cartItems = cartItems, var=var)
         db.update_shoppingCartItem(mysql, customerId, sessionID, productId,quantity,datetime.now())
     else:
         print("har inte  produkt")
         quantity = amount
+        if product["product_available_amount"] < int(quantity):
+            var = "To many"+ product["product_name"] +" chosen max available: " + str(product["product_available_amount"])
+            productTest = db.select_products(mysql)
+            cartItems = db.get_shoppingCart(mysql, customerId, session['id'])
+            for item in cartItems:
+                products = db.get_product(mysql,item['product_id'])
+                item['price'] = products['product_price']
+                item['product_name'] = products['product_name']
+                item['TotalPrice'] = int(item['price']) * int(item['quantity'])
+                totalPrice = totalPrice + item['TotalPrice']
+            return render_template('index.html', productTest=productTest, cartItems = cartItems, var=var)
         db.insert_shoppingCart(mysql, customerId, sessionID, productId,quantity,datetime.now())
     return redirect('/')
 
@@ -358,38 +382,72 @@ def viewProduct():
     topreview = db.get_review(mysql, productId, 0)
     answers = db.get_review(mysql, productId, 1)
 
-    return render_template('productpage.html', product = product, topreview = topreview, answers = answers)
+    ratings = db.select_rating(mysql)
+
+    return render_template('productpage.html', product = product, topreview = topreview, answers = answers, ratings = ratings)
 
 @app.route('/review', methods=['POST'])
 def addReview():
     productId = request.form['product_id']
+    # try:
+    product = db.get_product_from_customerorder(mysql, productId, session['id'])
+    if session['loggedin'] and product:
+        order = db.get_order(mysql, product["order_id"])
+        customer_id = session['id']
+        customer  = db.get_user_name(mysql, customer_id)
+        name = customer["first_name"]
+        parent_id = None
+        publishedAt = datetime.now()
+        purchase_date = order["date_of_purchase"]
+        review = request.form['review']
+        db.insert_review(mysql, productId, customer_id, parent_id, publishedAt, purchase_date, review, name)
+        rating = request.form.get('starRating')
+        if db.get_rating(mysql, customer_id, productId):
+            db.update_rating(mysql, customer_id, productId, rating)
+        else:
+            db.insert_rating(mysql, customer_id, productId, rating)
+        db.update_productAvrageRating(mysql, productId)
+    else:
+        var = "<h1>Needs to have purchase product to add review</h1>"
+        return var 
+    product = db.get_product(mysql, productId)
+    topreview = db.get_review(mysql, productId, 0)
+    answers = db.get_review(mysql, productId, 1)
+    ratings = db.select_rating(mysql)
+
+    return render_template('productpage.html', product = product, topreview = topreview, answers = answers, ratings = ratings)
+    # except: 
+    #     var = "Needs to have acount to add review"
+    #     return "<h1>Needs to have purchase product to add review</h1>"
+    
+@app.route('/rating', methods=['POST'])
+def addRating():
+    productId = request.form['product_id']
     try:
         product = db.get_product_from_customerorder(mysql, productId, session['id'])
         if session['loggedin'] and product:
-            order = db.get_order(mysql, product["order_id"])
             customer_id = session['id']
-            customer  = db.get_user_name(mysql, customer_id)
-            name = customer["first_name"]
-            parent_id = None
-            publishedAt = datetime.now()
-            purchase_date = order["date_of_purchase"]
             rating = request.form['rating']
-            review = request.form['review']
-            
-            db.insert_review(mysql, productId, customer_id, parent_id, publishedAt, purchase_date, rating, review, name)
-            db.update_productAvrageRating(mysql,productId)
+            if db.get_rating(mysql, customer_id, productId):
+                db.update_rating(mysql, customer_id, productId, rating)
+            else:
+                db.insert_rating(mysql, customer_id, productId, rating)
+            db.update_productAvrageRating(mysql, productId)
         else:
-            var = "<h1>Needs to have purchase product to add review</h1>"
+            var = "<h1>Needs to have purchase product to add rating</h1>"
             return var 
         product = db.get_product(mysql, productId)
         topreview = db.get_review(mysql, productId, 0)
         answers = db.get_review(mysql, productId, 1)
+        ratings = db.select_rating(mysql)
 
-        return render_template('productpage.html', product = product, topreview = topreview, answers = answers)
+        return render_template('productpage.html', product = product, topreview = topreview, answers = answers, ratings = ratings)
     except: 
         var = "Needs to have acount to add review"
-        return "<h1>Needs to have purchase product to add review</h1>"
+        return "<h1>Needs to have purchase product to add rating</h1>"
     
+
+
 
 @app.route('/reviewAns', methods=['POST'])
 def addAnswer():
@@ -404,22 +462,21 @@ def addAnswer():
             purchase_date = order["date_of_purchase"]
             customer  = db.get_user_name(mysql, customer_id)
             name = customer["first_name"]
-            rating = None
-            
             review = request.form['review']
-            db.insert_review(mysql, productId, customer_id, parent_id, publishedAt, purchase_date, rating, review,name)
+            db.insert_review(mysql, productId, customer_id, parent_id, publishedAt, purchase_date, review,name)
         elif session['isAdmin']:
             customer_id = None
             publishedAt = datetime.now()
             purchase_date = None
-            rating = None
             name = "Admin"
             review = request.form['review']
-            db.insert_review(mysql, productId, customer_id, parent_id, publishedAt, purchase_date, rating, review, name)
+            db.insert_review(mysql, productId, customer_id, parent_id, publishedAt, purchase_date, review, name)
         product = db.get_product(mysql, productId)
         topreview = db.get_review(mysql, productId, 0)
         answers = db.get_review(mysql, productId, 1)
-        return render_template('productpage.html', product = product, topreview = topreview, answers = answers)
+        ratings = db.select_rating(mysql)
+
+        return render_template('productpage.html', product = product, topreview = topreview, answers = answers, ratings = ratings)
     except:
         try: 
             if session['loggedin']:

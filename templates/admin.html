@@ -10,31 +10,9 @@
 
 </head>
 <body>
-<nav class="navbar navbar-expand-sm navbar-dark bg-dark">
-  <div class="container-fluid">
-    <a class="navbar-brand" href="index.html">Home</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mynavbar">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="mynavbar">
-      <ul class="navbar-nav me-auto">
-        <li class="nav-item">
-          <a class="nav-link" href="javascript:void(0)">Link</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="javascript:void(0)">Link</a>
-        </li>
-        <li class="nav-item">
-          <form action="/users">
-            <a class="nav-link" data-toggle="collapse" href="#collapseExample" aria-expanded="false" aria-controls="collapseExample">users</a>
-          </form>
-
-        </li>
-      </ul>
-    </div>
+  <div id="nav-placeholder">
+    {% include 'nav.html' %}
   </div>
-</nav>
-
 
 
 
@@ -52,6 +30,7 @@
   </form>
 </div>
 
+{{ var }}
 
 <!-- Confirming order -->
 <form action="/show-orders">
@@ -84,8 +63,8 @@
         {% for order in orders %}
 
         <tr>
-          <form action="confirm-a-order">
-          <input type="hidden" name="product_id" value="{{order['product_id']}}">
+          <form action="/confirm-a-order" method="get">
+          <input type="hidden" name="orderproductid" value="{{ order['order_product_id'] }}">
             <td>{{order['order_product_id']}}</td>
             <td>{{order['customer_id']}}</td>
             <td>{{order['order_id']}}</td>

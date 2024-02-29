@@ -13,7 +13,11 @@ def select_products(mysql):
     products = cur.fetchall()
     return products
 
-
+def select_rating(mysql):
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute('SELECT * FROM Rating')
+    ratings = cur.fetchall()
+    return ratings
 
 
 def get_product(mysql,product_id):
@@ -40,9 +44,9 @@ def get_all_product_from_order(mysql):
     products = cur.fetchall()
     return products
 
-def get_a_product_from_order(mysql,product_id):
+def get_a_product_from_order(mysql,order_product_id):
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    cur.execute('SELECT * FROM OrderProducts WHERE product_id = %s', (product_id,))
+    cur.execute('SELECT * FROM OrderProducts WHERE order_product_id = %s', (order_product_id,))
     products = cur.fetchone()
     return products
 
@@ -70,6 +74,12 @@ def get_user(mysql,email):
     cur.execute('SELECT * FROM Users WHERE email = % s', (email,))
     user = cur.fetchone()
     return user
+
+def get_rating(mysql,customer_id, product_id):
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute('SELECT * FROM Rating WHERE customer_id = %s and  product_id = %s', (customer_id,product_id))
+    rating = cur.fetchone()
+    return rating
 
 def get_user_name(mysql,customer_id):
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
@@ -147,12 +157,23 @@ def insert_orderProduct(mysql,customer_id, order_id, product_id, product_name, p
         ,(customer_id,order_id, product_id, product_name, product_price, amount, total_price,))
     mysql.connection.commit()
 
-def insert_review(mysql, product_id, customer_id, parent_id, publishedAt, purchase_date, rating, review, name):
+def insert_review(mysql, product_id, customer_id, parent_id, publishedAt, purchase_date, review, name):
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    cur.execute("INSERT INTO Reviews (product_id, customer_id, parent_id, publishedAt, purchase_date, rating, review, name) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)"
-        ,(product_id,customer_id, parent_id, publishedAt, purchase_date, rating, review,name,))
+    cur.execute("INSERT INTO Reviews (product_id, customer_id, parent_id, publishedAt, purchase_date, review, name) VALUES (%s,%s,%s,%s,%s,%s,%s)"
+        ,(product_id,customer_id, parent_id, publishedAt, purchase_date, review, name,))
     mysql.connection.commit()
 
+def insert_rating(mysql, customer_id, product_id, rating):
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("INSERT INTO Rating (customer_id, product_id, rating) VALUES (%s,%s,%s)"
+        ,(customer_id, product_id, rating,))
+    mysql.connection.commit()
+
+
+def update_rating(mysql,customer_id, product_id, rating):
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("UPDATE Rating SET rating =%s Where customer_id= %s and product_id = %s ", (rating, customer_id,product_id,))
+    mysql.connection.commit()
 
 def update_order(mysql, order_id, total_price):
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
@@ -176,9 +197,9 @@ def update_available_amount(mysql,product_available_amount, product_id):
         ,( product_available_amount, product_id,))
     mysql.connection.commit()
 
-def update_a_product_from_order(mysql, product_id):
+def update_a_product_from_order(mysql, order_product_id):
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    cur.execute('UPDATE OrderProducts SET conf = true WHERE product_id = %s', (product_id,))
+    cur.execute('UPDATE OrderProducts SET conf = true WHERE order_product_id = %s', (order_product_id,))
     mysql.connection.commit()
 
 def update_shoppingCartItem(mysql, customer_id, session_id, product_id, quantity, updatedAt):
@@ -196,7 +217,7 @@ def update_shoppingCart(mysql, customer_id, session_id):
 
 def update_productAvrageRating(mysql, product_id):
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    cur.execute('UPDATE Products SET avrage_rating = (SELECT AVG(rating) FROM Reviews where product_id = %s) WHERE product_id = %s', (product_id, product_id,))
+    cur.execute('UPDATE Products SET avrage_rating = (SELECT AVG(rating) FROM Rating where product_id = %s) WHERE product_id = %s', (product_id, product_id,))
     mysql.connection.commit()
 
 def delete_shoppingCartItem(mysql, customer_id, session_id, product_id):
