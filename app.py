@@ -238,10 +238,10 @@ def showOrders():
     orders = db.get_all_product_from_order(mysql)
     return render_template('admin.html', orders=orders)
 
-@app.route('/confirm-a-order', methods=['POST','GET'])
+@app.route('/confirm-a-order', methods=['POST'])
 def confirmAOrder():
-    # orderProductId = request.form.get('orderproductid')
-    orderProductId = request.args['orderproductid']
+    orderProductId = request.form['orderproductid']
+    # orderProductId = request.args['orderproductid']
     print("---------------------------",orderProductId)
     order = db.get_a_product_from_order(mysql, orderProductId)
     amountPurchased = order['amount']
@@ -318,7 +318,30 @@ def addToShoppingCart():
         sessionID = session['id']
     product = db.get_product(mysql, productId)
 
-    
+    if not isinstance(amount, int):
+        var = "Amount of product needs to be a number"
+        productTest = db.select_products(mysql)
+        cartItems = db.get_shoppingCart(mysql, customerId, session['id'])
+        for item in cartItems:
+            products = db.get_product(mysql,item['product_id'])
+            item['price'] = products['product_price']
+            item['product_name'] = products['product_name']
+            item['TotalPrice'] = int(item['price']) * int(item['quantity'])
+            totalPrice = totalPrice + item['TotalPrice']
+        return render_template('index.html', productTest=productTest, cartItems = cartItems, var=var)
+    elif int(amount) <= 0:
+        var = "Amount of product needs to greater than 0"
+        productTest = db.select_products(mysql)
+        cartItems = db.get_shoppingCart(mysql, customerId, session['id'])
+        for item in cartItems:
+            products = db.get_product(mysql,item['product_id'])
+            item['price'] = products['product_price']
+            item['product_name'] = products['product_name']
+            item['TotalPrice'] = int(item['price']) * int(item['quantity'])
+            totalPrice = totalPrice + item['TotalPrice']
+        return render_template('index.html', productTest=productTest, cartItems = cartItems, var=var)
+
+
     productInCart = db.get_shoppingCartItem(mysql, customerId, sessionID, productId)
     print(productInCart)
     if productInCart:

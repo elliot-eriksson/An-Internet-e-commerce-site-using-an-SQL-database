@@ -57,13 +57,14 @@
               <button id='toggle' class='btn btn-success'>
                 Confirm all orders
               </button>
+            </form>
             </th>
           </tr>
         </thead>
         {% for order in orders %}
 
         <tr>
-          <form action="/confirm-a-order" method="get">
+          <form action="/confirm-a-order" method="post">
           <input type="hidden" name="orderproductid" value="{{ order['order_product_id'] }}">
             <td>{{order['order_product_id']}}</td>
             <td>{{order['customer_id']}}</td>
@@ -82,7 +83,7 @@
         {% endfor %}
       </table>
       
-      </form>
+     
   </div>
 </div>
 
