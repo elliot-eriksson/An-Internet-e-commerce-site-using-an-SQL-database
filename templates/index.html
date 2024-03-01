@@ -5,146 +5,140 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"> </script>
 
 </head>
 
-<nav class="navbar navbar-expand-sm navbar-dark bg-dark">
-  <div class="container-fluid">
-    <a class="navbar-brand" href="javascript:void(0)">Logo</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mynavbar">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="mynavbar">
-      <ul class="navbar-nav me-auto">
-        <li class="nav-item">
-          <a class="nav-link" href="javascript:void(0)">Link</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="javascript:void(0)">Link</a>
-        </li>
-        <li class="nav-item">
-          <form action="/login">
-            <a class="nav-link" href="login">Login</a>
-          </form>
 
-        </li>
-      </ul>
-      <!-- <form class="d-flex">
-        <form action="/select">
-          <button class="btn btn-primary" type="button">select all</button>
-        </form>
-      </form> -->
 
-    </div>
+<div id="nav-placeholder">
+  {% include 'nav.html' %}
+  <div class="container-fluid p-5  text-white text-center" style="background-color: rgb(15, 25, 103);">
+    <h1>GearUp</h1>
+    <p>Gear up before the tenta hits you!</p>
   </div>
-</nav>
+
+</div>
 
 <body>
-  <div class="container-fluid p-5 bg-success text-white text-center">
-    <h1>Website Name</h1>
-    <p>slogan</p>
-  </div>
-
-<!-- #--------------------->
-<!-- <div id="login" class="col-sm-4">
-  <form action="/login" method="post">
-    <div class="mb-3 mt-3">
-      <label for="email" class="form-label">Email:</label>
-      <input type="email" class="form-control" id="email" placeholder="Enter email" name="email">
-    </div>
-    <div class="mb-3">
-      <label for="pwd" class="form-label">Password:</label>
-      <input type="password" class="form-control" id="pwd" placeholder="Enter password" name="pwd">
-    </div>
-    <div class="form-check mb-3">
-      <label class="form-check-label">
-        <input class="form-check-input" type="checkbox" name="remember"> Remember me
-      </label>
-    </div>
-    <button type="submit" class="btn btn-primary">Submit</button>
-  </form>
-</div> -->
-
 
 
   <div class="container">
+    <header>
+    <div class="title"><h1>Product List</h1></div>
+  </header>
     <div class="row">
+      
       {% for product in productTest %}
-      <div class="col-md-3 mt-3">
+      <div id="productDisplay" class=" col-md-2 mt-6">
         <div class="card">
           <img src="{{ url_for('static', filename=product['image_address1']) }}" alt="{{product['product_name']}}">
 
-          <div class="card-body">
-            <h5 class="text-center">{{product['product_name']}}</h5>
-            <p class="text-center">Price ${{product['product_price']}}</p>
-          </div>
-          <div class="card-footer">
-            <a href="#" class="float-left btn btn-sm btn-primary">details</a>
-            <a onclick="cartSession('{{product['product_id']}}')" class="float-right btn btn-sm btn-warning">Add to cart</a>
-
+            <div class="card-body">
+              <h5 class="text-center">{{product['product_name']}}</h5>
+              <p class="text-center">Price ${{product['product_price']}}</p>
+              <p id="test" class="text-center small" >in stock {{product['product_available_amount']}}</p>
+            </div>
+            <div class="card-footer">
+              <div class="col-sm3">
+                <div class="View-product">
+                  <form action="/view-product" method="get">
+                    <input type="hidden" name="product_id" value="{{ product['product_id'] }}">
+                    <input type="submit" value="View product" class="btn btn-primary w-100">
+                  </form>
+                </div>
+                <div class="Add-to-cart">
+                  <form action="/add-to-cart" method="post">
+                    <input type="hidden" name="product_id" value="{{ product['product_id'] }}">
+                    <input type="text" class="product_quantity" name="quantity" value="1" size="2">
+                    <input type="submit" value="Add to cart" class="btn btn-warning">
+                  </form>
+                </div>
+              </div>
+              
+            </div>
           </div>
         </div>
+        {% endfor %}
       </div>
-      {% endfor %}
+    </div>
+
+  <div class="products" id="productstable">
+    <h1>Shopping Cart</h1>
+    <div class="table-responsive">
+      <table class="table">
+
+          <thead>
+              <tr>
+              <th scope="col"></th>
+              <th scope="col">Product name</th>
+              <th scope="col">Unit price</th>
+              <th scope="col">Amount</th>
+              <th scope="col">Total price</th>
+              <th scope="col">
+                <form action="/clear-cart" method="post">
+                    <input type="hidden" name="product_id" value="{{cartItems['product_id']}}">
+                    <button id='submit' class='btn btn-danger'>Clear cart
+                </form>
+              </th>
+              </tr>
+          </thead>
+          {% for product in cartItems %}
+          <tr>
+            {% for pic in productTest if pic["product_id"] == product["product_id"]%}
+            <td><img src="{{ url_for('static', filename=pic['image_address1']) }}" alt="{{pic['product_name']}}"></td>
+            {% endfor %}
+            <td>{{product['product_name']}}</td>
+            <td>{{product['price']}}</td>
+            <td>{{product['quantity']}}</td>
+            <td>{{product['TotalPrice']}}</td>
+            <form action="/remove-item-from-cart" method="post">
+                <input type="hidden" name="product_id" value="{{product['product_id']}}">
+                <td><button id='submit' class='btn btn-danger'>Remove item </td>
+            </form>
+          </tr>
+          {% endfor %}
+          <div class="total-price">
+            <p>Total Price: {{totalUnitPrice }} </p>
+        </div>
+      </table>
+      <div class="checkout-button">
+      <form action="/checkout">
+        <button  type="submit" name="users" class="btn btn-danger ">Check out</button>
+      </form>
+      </div>
     </div>
   </div>
   
 
-  <div id="register" class="col-sm-4">
-    <form action="/insert new customer" method="post">
-      <div class="form-group">
-        <label for="first_name" class="form-label">First name:</label>
-        <input type="text" class="form-control" id="first_name" placeholder="Enter first name" name="first_name">
-      </div>
-      <div class="form-group">
-        <label for="last_name" class="form-label">Last name:</label>
-        <input type="text" class="form-control" id="last_name" placeholder="Enter last name" name="last_name">
-      </div>
-      <div class="form-group">
-        <label for="email" class="form-label">Email:</label>
-        <input type="text" class="form-control" id="email" placeholder="Enter email" name="email">
-      </div>
-      <div class="form-group">
-        <label for="password" class="form-label">Password:</label>
-        <input type="password" class="form-control" id="password" placeholder="Enter password" name="password">
-      </div>
+  <!-- <div class="cartTab">
 
-    <div class="mb-3 mt-3">
-      <label for="date_of_birth" class="form-label">Date of birth:</label>
-      <input type="date" class="form-control" id="date_of_birth" placeholder="Enter date of birth" name="date_of_birth">
+    {% for product in cartItems %}
+    <div class="listCart">
+      <h5 class="text-center">{{product['product_name']}}</h5>
+      <p class="text-center">Price ${{product['product_price']}}</p>
     </div>
+    {% endfor %}
+    <div class="btn">
+        <a href="shopping_cart.html" class="btn btn-success">View cart</a>
+        <button onclick="clearCart()" class="checkOut">Check Out</button>
+    </div>
+</div> -->
 
-    <button type="submit" name="submit" class="btn btn-success">Sign up</button>
-    </form>
-  </div> 
 
-  <div>
+  <div id="logout">
   <form action="/logout">
       <button type="submit" name="submit" class="btn btn-danger">Logout</button>
   </form>
   </div>
 
-  <div>
-    <form action="/users">
-        <button type="users" name="users" class="btn btn-danger">select</button>
-    </form>
-  </div>
-    <h4> The details are:</h4>
-       {{var}}
-
-    <br>
-    <br>
-    <hr>
-</div>
-<form action="/checkout">
-  <button onclick = "setCartCookie()" type="submit" name="users" class="btn btn-danger">check out</button>
-</form>
+  {{ var }}
 
 <div class="mt-5 p-4 bg-dark text-white text-center">
   <p>Footer</p>
 </div>
+
 <script src="{{ url_for('static', filename='script.js') }}"></script>
 
 </body>

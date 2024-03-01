@@ -10,31 +10,9 @@
 
 </head>
 <body>
-<nav class="navbar navbar-expand-sm navbar-dark bg-dark">
-  <div class="container-fluid">
-    <a class="navbar-brand" href="javascript:void(0)">Logo</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mynavbar">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="mynavbar">
-      <ul class="navbar-nav me-auto">
-        <li class="nav-item">
-          <a class="nav-link" href="javascript:void(0)">Link</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="javascript:void(0)">Link</a>
-        </li>
-        <li class="nav-item">
-          <form action="/users">
-            <a class="nav-link" data-toggle="collapse" href="#collapseExample" aria-expanded="false" aria-controls="collapseExample">users</a>
-          </form>
-
-        </li>
-      </ul>
-    </div>
+  <div id="nav-placeholder">
+    {% include 'nav.html' %}
   </div>
-</nav>
-
 
 
 
@@ -52,6 +30,62 @@
   </form>
 </div>
 
+{{ var }}
+
+<!-- Confirming order -->
+<form action="/show-orders">
+  <button id='toggle' class='btn btn-warning'>
+    Show
+  </button>
+</form>
+
+<div class="orders" id="orders-table">
+  <div class="table-responsive">
+    <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">order_product_id</th>
+            <th scope="col">customer_id</th>
+            <th scope="col">order_id</th>
+            <th scope="col">product_id</th>
+            <th scope="col">product_name</th>
+            <th scope="col">product_price</th>
+            <th scope="col">amount</th>
+            <th scope="col">total_price</th>
+            <th>
+            <form action="/confirm-orders">
+              <button id='toggle' class='btn btn-success'>
+                Confirm all orders
+              </button>
+            </form>
+            </th>
+          </tr>
+        </thead>
+        {% for order in orders %}
+
+        <tr>
+          <form action="/confirm-a-order" method="post">
+          <input type="hidden" name="orderproductid" value="{{ order['order_product_id'] }}">
+            <td>{{order['order_product_id']}}</td>
+            <td>{{order['customer_id']}}</td>
+            <td>{{order['order_id']}}</td>
+            <td>{{order['product_id']}}</td>
+            <td>{{order['product_name']}}</td>
+            <td>{{order['product_price']}}</td>
+            <td>{{order['amount']}}</td>
+            <td>{{order['total_price']}}</td>
+            <td> <button id='submit' class='btn btn-success'> 
+              Confirm order 
+            </button></td>
+          </form>
+          </tr>
+
+        {% endfor %}
+      </table>
+      
+     
+  </div>
+</div>
 
     
 <div class="users" id="userstable">

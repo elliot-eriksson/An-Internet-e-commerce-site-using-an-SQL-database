@@ -1,16 +1,11 @@
-var cartArray = []
-function cartSession(product_name){
-  console.log(product_name)
-  cartArray.push(product_name)
-  console.log(cartArray)
+
+function showElement(element){
+  var showElement = document.getElementById(element);
+  if (showElement.style.display === 'none') {
+    showElement.style.display = 'block';
+  } else {
+    showElement.style.display = 'none';
+  }
+  
 }
 
-function setCartCookie() {
-  // Convert the cartArray to a JSON string
-  var cartArrayString = JSON.stringify(cartArray);
-
-  // Set the cookie with the cartArrayString
-  document.cookie = "cartArray=" + cartArrayString + "; path=/";
-  console.log("Cookie set");
- 
-}
