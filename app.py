@@ -19,7 +19,8 @@ userpass = input()
 app.config['MYSQL_PASSWORD'] = userpass
 app.config['MYSQL_DB'] = 'D0018E1'
 
-UPLOAD_FOLDER = 'C:/Users/Ellio/Desktop/D0018E/An-Internet-e-commerce-site-using-an-SQL-database/static/images'
+# if run on local machine change UPLOAD_FOLDER to local path
+UPLOAD_FOLDER = '/home/ubuntu/website/An-Internet-e-commerce-site-using-an-SQL-database-AdminPage/static/images'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 mysql = MySQL(app)
@@ -549,8 +550,10 @@ def clearCart():
     db.delete_shoppingCart(mysql, customerId, sessionId)
     return redirect("/index.html")
 
+# if run local
+# if __name__ == "__main__":
+#     app.run(port=5002, debug=True)
 
+# if run on aws ubuntu
 if __name__ == "__main__":
-    app.run(port=5002, debug=True)
-
-
+    app.run(host='0.0.0.0', port=5000, debug=True, threaded=True)
